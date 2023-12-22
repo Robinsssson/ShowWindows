@@ -43,6 +43,8 @@ MainWindow::MainWindow(QWidget *parent) :
     // object Initialization
     m_chart = new QChart;
     m_scene = new QGraphicsScene;
+    threadVideoShowTask = new QThread;
+    threadVideoTask = new QThread;
     m_lineSeries = new QLineSeries;
     QImage image(480, 400, QImage::Format_RGB888);
     image.fill(QColor(Qt::black));
@@ -51,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent) :
     SingletonMatQueue::GetInstance();
     m_captureTask = new CaptureTask;
     m_captureShowTask = new CaptureShowTask(ui->VideoShow);
+    m_captureShowTask->moveToThread(threadVideoShowTask);
+    m_captureTask->moveToThread(threadVideoTask);
     //connect
     connect(this, QOverload<int>::of(&MainWindow::thisCapture), m_captureTask,
             &CaptureTask::getCaptureNumber);
@@ -59,24 +63,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, QOverload<QString>::of(&MainWindow::SendVideoFileName), m_captureTask,
             &CaptureTask::SetVideo);
     connect(this, &MainWindow::SendFpsNumber, m_captureShowTask, &CaptureShowTask::GetFpsNumber, Qt::QueuedConnection);
-    m_captureTask->start();
-    m_captureShowTask->start();
-
+    threadVideoTask->start();
+    threadVideoShowTask->start();
 }
 
 MainWindow::~MainWindow() {
-    m_captureShowTask->quit();
-    m_captureShowTask->wait();
-    m_captureShowTask->deleteLater();
+    threadVideoShowTask->quit();
+    threadVideoShowTask->wait();
+    threadVideoShowTask->deleteLater();
 
-    m_captureTask->quit();
-    m_captureTask->wait();
-    m_captureTask->deleteLater();
+    threadVideoTask->quit();
+    threadVideoTask->wait();
+    threadVideoTask->deleteLater();
 
     delete m_scene;
     delete m_chart;
     delete m_lineSeries;
     delete ui;
+    delete m_captureShowTask;
+    delete m_captureTask;
 }
 
 void MainWindow::on_pushButtonOpen_clicked() {

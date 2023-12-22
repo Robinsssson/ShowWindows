@@ -68,5 +68,7 @@ private:
     CaptureTask *m_captureTask;
     int m_selectedCapture;
     CaptureShowTask *m_captureShowTask;
+    QThread *threadVideoShowTask;
+    QThread *threadVideoTask;
 };
 #endif // MAINWINDOW_H

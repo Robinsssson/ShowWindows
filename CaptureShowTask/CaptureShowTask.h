@@ -10,18 +10,12 @@
 #include <QLabel>
 #include <opencv2/opencv.hpp>
 
-class CaptureShowTask : public QThread {
+class CaptureShowTask : public QObject {
 Q_OBJECT
-
 public:
     CaptureShowTask(QLabel *label);
-
     ~CaptureShowTask() override;
-
-    void run() override;
-
     void CaptureShow();
-
 public slots:
 
     void getCaptureStatus(bool);

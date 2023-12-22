@@ -12,16 +12,13 @@
 #include <QThread>
 #include <QEventLoop>
 
-class CaptureTask : public QThread {
+class CaptureTask : public QObject {
 Q_OBJECT
 
 public:
     CaptureTask();
 
     ~CaptureTask() override;
-
-protected:
-    void run() override;
 
 public slots:
 

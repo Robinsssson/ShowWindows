@@ -8,7 +8,7 @@
 #include <QThread>
 
 void ImageProcessTask::run() {
-//    qDebug() << QThread::currentThreadId();
+    qDebug() <<"ImageProcessTask ID:" << QThread::currentThreadId();
     if (SingletonMatQueue::GetInstance()->checkNotProcessed() > 0) {
         Q_Mat q_mat = SingletonMatQueue::GetInstance()->dequeueNotProcessed();
         SingletonMatQueue::GetInstance()->enqueueProcessed(ImageProcess::MatTranslate(q_mat.mat), q_mat.time);

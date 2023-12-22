@@ -18,28 +18,23 @@
  *
  * */
 CaptureTask::CaptureTask() {
-    m_timer = new QTimer;
+    m_timer = nullptr;
     m_capture = new cv::VideoCapture;
     m_mat = new cv::Mat;
     m_videoName = new std::string;
     m_captureSelect = 0;
-    qDebug() << "CaptureTask constructor";
+    qDebug() << "CaptureTask Constructor ID:" << QThread::currentThreadId();
 }
 
 CaptureTask::~CaptureTask() {
-    qDebug() << "CaptureTask delete";
+    qDebug() << "CaptureTask Destory ID:"<< QThread::currentThread();
     delete m_timer;
     delete m_capture;
     delete m_mat;
 }
 
-void CaptureTask::run() {
-    m_timer->stop();
-    connect(m_timer, &QTimer::timeout, this, &CaptureTask::PushMat, Qt::DirectConnection);
-    exec();
-}
-
 void CaptureTask::PushMat() {
+    qDebug() <<"CaptureTask ID:" << QThread::currentThreadId();
     if (!m_capture->read(*m_mat)) {
         getCaptureStatus(false);
     } else {
@@ -72,6 +67,11 @@ void CaptureTask::getCaptureNumber(int number) {
 
 void CaptureTask::getCaptureStatus(bool boolean) {
     m_switchCapture = boolean;
+    if(m_timer == nullptr)
+    {
+        m_timer = new QTimer;
+        connect(m_timer, &QTimer::timeout, this, &CaptureTask::PushMat, Qt::DirectConnection);
+    }
     if (m_switchCapture) {
         m_timer->start(1);
 

@@ -23,25 +23,22 @@ CaptureShowTask::CaptureShowTask(QLabel *label) {
     m_mat = new cv::Mat;
     m_label = label;
     m_fps = 1; //label 1
-    qDebug() << "CaptureShowTask Constructed";
+    qDebug() << "CaptureShowTask Constructed ID:" << QThread::currentThreadId();
 }
 
 CaptureShowTask::~CaptureShowTask() {
     delete m_timer;
     delete m_mat;
-    qDebug() << "CaptureShowTask Destroyed";
-}
-
-void CaptureShowTask::run() {
-    connect(m_timer, &QTimer::timeout, this, &CaptureShowTask::CaptureShow, Qt::DirectConnection);
-    qDebug() <<"CaptureShowTask " << QThread::currentThreadId();
-    exec();
+    qDebug() << "CaptureShowTask Destroyed ID:" << QThread::currentThreadId();
 }
 
 void CaptureShowTask::getCaptureStatus(bool boolean) {
     m_videoShowFlag = boolean;
     if(m_timer == nullptr)
+    {
         m_timer = new QTimer;
+        connect(m_timer, &QTimer::timeout, this, &CaptureShowTask::CaptureShow, Qt::DirectConnection);
+    }
     if (m_videoShowFlag) {
         m_timer->start(m_fps);
     } else {
@@ -51,11 +48,9 @@ void CaptureShowTask::getCaptureStatus(bool boolean) {
 
 void CaptureShowTask::CaptureShow() {
     if (SingletonMatQueue::GetInstance()->checkProcessed() == 0) {
-        qDebug() << SingletonMatQueue().checkProcessed();
         return;
     }
-    qDebug() <<"CaptureShowTask " << QThread::currentThreadId();
-//    qDebug() << SingletonMatQueue::GetInstance()->checkProcessed();
+    qDebug() <<"CaptureShowTask ID:" << QThread::currentThreadId();
     *m_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
     auto qImage = ImageProcess::cvMat2QImage(*m_mat);
     m_label->setPixmap(QPixmap::fromImage(qImage));
