@@ -5,18 +5,28 @@
 #include <QLineSeries>
 #include <QChart>
 #include <QGraphicsScene>
+#include <opencv2/opencv.hpp>
+#include <QFunctionPointer>
+#include <QChartView>
 
+using valueCalFunction = double(*)(const cv::Mat&);
 class AxesFreshTask : public QObject
 {
     Q_OBJECT
 public:
-    explicit AxesFreshTask(QObject *parent = nullptr);
-    void setGraphicsView(QGraphicsView * qGraphicsView) {this->qGraphicsView = qGraphicsView; }
+    explicit AxesFreshTask(QChartView * qGraphicsView, QObject *parent = nullptr);
+    ~AxesFreshTask(void);
+    void setGraphicsView(QChartView * qGraphicsView) { this->qGraphicsView = qGraphicsView; }
+    void setCalFunction(valueCalFunction function) { m_function = function; }
+
+public slots:
+    void axesFresh(cv::Mat);
+
 private:
-    QGraphicsView* qGraphicsView;
+    QChartView* qGraphicsView;
     QLineSeries* qLineSeries;
     QChart* qChart;
-    QGraphicsScene* qScene;
+    valueCalFunction m_function;
 };
 
 #endif // AXESFRESHTASK_H

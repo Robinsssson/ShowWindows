@@ -59,9 +59,6 @@ public:
 private:
     bool m_captureOpenFlag = false;
     bool m_chart_windows_status = false;
-    QGraphicsScene *m_scene;
-    QLineSeries *m_lineSeries;
-    QChart *m_chart;
     QString m_videoFileName;
     bool m_videoFileFlag = false;
     int m_fpsConfig = 1;

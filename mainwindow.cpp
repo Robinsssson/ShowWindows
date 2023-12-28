@@ -40,13 +40,12 @@ MainWindow::MainWindow(QWidget *parent) :
     RefreshCaptureSelect();
 
     // object Initialization
-    m_chart = new QChart;
-    m_scene = new QGraphicsScene;
+
     threadVideoShowTask = new QThread;
     threadVideoTask = new QThread;
-    m_lineSeries = new QLineSeries;
+
     m_captureTask = new CaptureTask;
-    m_captureShowTask = new CaptureShowTask(ui->VideoShow);
+    m_captureShowTask = new CaptureShowTask(ui->graphicsView, ui->VideoShow);
     m_captureShowTask->moveToThread(threadVideoShowTask);
     m_captureTask->moveToThread(threadVideoTask);
 
@@ -75,7 +74,6 @@ void MainWindow::Ui_Init(Ui::MainWindow *_ui)
     image.fill(QColor(Qt::black));
     _ui->VideoShow->setPixmap(QPixmap::fromImage(image));
     _ui->graphicsView->setMinimumSize(480, 400);
-
 }
 
 MainWindow::~MainWindow() {
@@ -87,9 +85,6 @@ MainWindow::~MainWindow() {
     threadVideoTask->wait();
     threadVideoTask->deleteLater();
 
-    delete m_scene;
-    delete m_chart;
-    delete m_lineSeries;
     delete ui;
     delete m_captureShowTask;
     delete m_captureTask;
@@ -141,19 +136,6 @@ void MainWindow::on_actionImportVideos_triggered() {
 
 void MainWindow::on_pushButtonCreateChart_clicked() {
     if (!m_chart_windows_status) {
-        m_lineSeries->setPointsVisible(false);
-        m_lineSeries->append(1, 2);
-        m_lineSeries->append(2, 1);
-        m_lineSeries->append(3, 3);
-        m_chart->addSeries(m_lineSeries);
-        m_chart->createDefaultAxes();
-        m_chart->legend()->hide();
-        m_chart->setGeometry(0, 0, 460, 380);
-        m_scene->addItem(m_chart);
-        ui->graphicsView->setScene(m_scene);
-        ui->graphicsView->setRenderHint(QPainter::Antialiasing, true);
-        m_chart_windows_status = true;
-        ui->textBrowser->append(tr("图表开启\n"));
     } else {
 
     }
