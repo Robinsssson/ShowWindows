@@ -24,37 +24,37 @@
  *  2023/11/20
  *  线程池的优化
  *      1.考虑采用C++ priority_queue进行数据排序，在队列操作中采用struct {cv::mat ,QTime}进行数据标识，并通过id进行排序
- *
+ *      2.线程池目前测试无任何非期望运行情况，但是任有一下需要优化的细节
+ *          2.1 线程同步设计
+ *              线程池在运行任务的过程中往往是从队列中获取一个完整的处理任务进行测试，因而不符合提速的基本要求，期望可以拆分处理任务以达到线程高效利用的目的
+ *              线程池在运行的过程尽管已经进行了优化设计，但仍然只有单个线程加入池中
+ *          2.2 待定....
  * */
 
 MainWindow::MainWindow(QWidget *parent) :
         QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     // int Initialization
-    qDebug() << QThread::currentThreadId();
-    m_selectedCapture = 0;
+    qDebug() <<"MainThread" << QThread::currentThreadId();
     m_captureNumber = RefreshCameraNum();
     RefreshCaptureSelect();
-    m_fpsConfig = 1;
-    // bool Initialization
-    m_videoFileFlag = false;
-    m_chart_windows_status = false;
-    m_captureOpenFlag = false;
+
     // object Initialization
     m_chart = new QChart;
     m_scene = new QGraphicsScene;
     threadVideoShowTask = new QThread;
     threadVideoTask = new QThread;
     m_lineSeries = new QLineSeries;
-    QImage image(480, 400, QImage::Format_RGB888);
-    image.fill(QColor(Qt::black));
-    ui->VideoShow->setPixmap(QPixmap::fromImage(image));
-    ui->textBrowser->append(tr("测试\n"));
-    SingletonMatQueue::GetInstance();
     m_captureTask = new CaptureTask;
     m_captureShowTask = new CaptureShowTask(ui->VideoShow);
     m_captureShowTask->moveToThread(threadVideoShowTask);
     m_captureTask->moveToThread(threadVideoTask);
+
+    Ui_Init(ui);
+    ui->textBrowser->append(tr("测试\n"));
+
+    SingletonMatQueue::GetInstance();
+
     //connect
     connect(this, QOverload<int>::of(&MainWindow::thisCapture), m_captureTask,
             &CaptureTask::getCaptureNumber);
@@ -63,8 +63,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, QOverload<QString>::of(&MainWindow::SendVideoFileName), m_captureTask,
             &CaptureTask::SetVideo);
     connect(this, &MainWindow::SendFpsNumber, m_captureShowTask, &CaptureShowTask::GetFpsNumber, Qt::QueuedConnection);
+
     threadVideoTask->start();
     threadVideoShowTask->start();
+}
+
+void MainWindow::Ui_Init(Ui::MainWindow *_ui)
+{
+    _ui->VideoShow->setMinimumSize(480, 400);
+    QImage image(480, 400, QImage::Format_RGB888);
+    image.fill(QColor(Qt::black));
+    _ui->VideoShow->setPixmap(QPixmap::fromImage(image));
+    _ui->graphicsView->setMinimumSize(480, 400);
+
 }
 
 MainWindow::~MainWindow() {
@@ -90,6 +101,7 @@ void MainWindow::on_pushButtonOpen_clicked() {
     m_captureOpenFlag = true;
     emit switchCapture(m_captureOpenFlag);
     ui->textBrowser->append(tr("摄像头开启\n"));
+
 }
 
 void MainWindow::on_pushButtonClose_clicked() {
@@ -136,7 +148,7 @@ void MainWindow::on_pushButtonCreateChart_clicked() {
         m_chart->addSeries(m_lineSeries);
         m_chart->createDefaultAxes();
         m_chart->legend()->hide();
-        m_chart->setGeometry(0, 0, 480, 380);
+        m_chart->setGeometry(0, 0, 460, 380);
         m_scene->addItem(m_chart);
         ui->graphicsView->setScene(m_scene);
         ui->graphicsView->setRenderHint(QPainter::Antialiasing, true);

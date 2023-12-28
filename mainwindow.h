@@ -30,6 +30,7 @@ private:
 
     void RefreshCaptureSelect();
 
+    void Ui_Init(Ui::MainWindow *_ui);
 
 public slots:
 
@@ -56,17 +57,17 @@ signals:
 public:
     Ui::MainWindow *ui;
 private:
-    bool m_captureOpenFlag;
-    bool m_chart_windows_status;
+    bool m_captureOpenFlag = false;
+    bool m_chart_windows_status = false;
     QGraphicsScene *m_scene;
     QLineSeries *m_lineSeries;
     QChart *m_chart;
     QString m_videoFileName;
-    bool m_videoFileFlag;
-    int m_fpsConfig;
+    bool m_videoFileFlag = false;
+    int m_fpsConfig = 1;
     int m_captureNumber;
     CaptureTask *m_captureTask;
-    int m_selectedCapture;
+    int m_selectedCapture = 0;
     CaptureShowTask *m_captureShowTask;
     QThread *threadVideoShowTask;
     QThread *threadVideoTask;

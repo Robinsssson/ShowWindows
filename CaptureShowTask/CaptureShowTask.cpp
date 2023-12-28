@@ -53,5 +53,6 @@ void CaptureShowTask::CaptureShow() {
     qDebug() <<"CaptureShowTask ID:" << QThread::currentThreadId();
     *m_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
     auto qImage = ImageProcess::cvMat2QImage(*m_mat);
+    m_label->setFixedSize(qImage.size().width(), qImage.size().height());
     m_label->setPixmap(QPixmap::fromImage(qImage));
 }
