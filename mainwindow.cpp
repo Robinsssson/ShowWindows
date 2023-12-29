@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "MatQueue/SingletonMatQueue.h"
 #include "Project_Config.h"
+#include "ImageProcess/ImageProcess.h"
 
 /* 2023/11/19
  * 线程池的设计
@@ -41,14 +42,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // object Initialization
 
+    threadAxesFreshTask = new QThread;
     threadVideoShowTask = new QThread;
     threadVideoTask = new QThread;
-
+    axesFreshTask = new AxesFreshTask(ui->chartView);
     m_captureTask = new CaptureTask;
-    m_captureShowTask = new CaptureShowTask(ui->graphicsView, ui->VideoShow);
+    m_captureShowTask = new CaptureShowTask(ui->VideoShow);
     m_captureShowTask->moveToThread(threadVideoShowTask);
     m_captureTask->moveToThread(threadVideoTask);
+    axesFreshTask->moveToThread(threadAxesFreshTask);
 
+    axesFreshTask->setCalFunction(ImageProcess::calGrayPercent);
     Ui_Init(ui);
     ui->textBrowser->append(tr("测试\n"));
 
@@ -62,9 +66,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, QOverload<QString>::of(&MainWindow::SendVideoFileName), m_captureTask,
             &CaptureTask::SetVideo);
     connect(this, &MainWindow::SendFpsNumber, m_captureShowTask, &CaptureShowTask::GetFpsNumber, Qt::QueuedConnection);
+    connect(m_captureShowTask, &CaptureShowTask::SendMat, axesFreshTask, &AxesFreshTask::axesFresh, Qt::QueuedConnection);
 
-    threadVideoTask->start();
-    threadVideoShowTask->start();
+    threadVideoTask->start(QThread::HighestPriority);
+    threadAxesFreshTask->start(QThread::LowPriority);
+    threadVideoShowTask->start(QThread::HighPriority);
 }
 
 void MainWindow::Ui_Init(Ui::MainWindow *_ui)
@@ -73,7 +79,7 @@ void MainWindow::Ui_Init(Ui::MainWindow *_ui)
     QImage image(480, 400, QImage::Format_RGB888);
     image.fill(QColor(Qt::black));
     _ui->VideoShow->setPixmap(QPixmap::fromImage(image));
-    _ui->graphicsView->setMinimumSize(480, 400);
+    _ui->chartView->setMinimumSize(480, 400);
 }
 
 MainWindow::~MainWindow() {
@@ -85,6 +91,11 @@ MainWindow::~MainWindow() {
     threadVideoTask->wait();
     threadVideoTask->deleteLater();
 
+    threadAxesFreshTask->quit();
+    threadAxesFreshTask->wait();
+    threadAxesFreshTask->deleteLater();
+
+    delete axesFreshTask;
     delete ui;
     delete m_captureShowTask;
     delete m_captureTask;

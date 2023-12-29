@@ -42,11 +42,11 @@ QImage ImageProcess::cvMat2QImage(const cv::Mat &mat) {
 }
 
 cv::Mat ImageProcess::MatTranslate(const cv::Mat &mat) {
-    cv::Mat out_mat;
-    cv::cvtColor(mat, out_mat, cv::COLOR_BGR2GRAY);
-    return out_mat;
+    return mat;
 }
 
 double ImageProcess::calGrayPercent(const cv::Mat &mat) {
-    return cv::mean(mat)[0];
+    cv::Mat out_mat;
+    cv::cvtColor(mat, out_mat, cv::COLOR_BGR2GRAY);
+    return cv::mean(out_mat)[0];
 }

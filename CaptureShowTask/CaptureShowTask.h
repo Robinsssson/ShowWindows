@@ -14,11 +14,11 @@
 class CaptureShowTask : public QObject {
 Q_OBJECT
 public:
-    CaptureShowTask(QChartView * qGraphicsView, QLabel *label);
+    CaptureShowTask(QLabel *label);
     ~CaptureShowTask() override;
     void CaptureShow();
 
-    AxesFreshTask* axesFreshTask;
+
 
 public slots:
 
@@ -35,7 +35,7 @@ private:
     QTimer *m_timer;
     cv::Mat *m_mat;
     QLabel *m_label;
-    QThread* threadAxesFreshTask;
+
 };
 
 

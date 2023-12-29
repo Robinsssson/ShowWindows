@@ -57,7 +57,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QChartView" name="graphicsView"/>
+           <widget class="QChartView" name="chartView"/>
           </item>
           <item>
            <widget class="QPushButton" name="pushButtonCreateChart">

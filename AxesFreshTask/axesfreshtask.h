@@ -8,6 +8,9 @@
 #include <opencv2/opencv.hpp>
 #include <QFunctionPointer>
 #include <QChartView>
+#include <QValueAxis>
+#include <QList>
+#include <QPointF>
 
 using valueCalFunction = double(*)(const cv::Mat&);
 class AxesFreshTask : public QObject
@@ -16,17 +19,20 @@ class AxesFreshTask : public QObject
 public:
     explicit AxesFreshTask(QChartView * qGraphicsView, QObject *parent = nullptr);
     ~AxesFreshTask(void);
-    void setGraphicsView(QChartView * qGraphicsView) { this->qGraphicsView = qGraphicsView; }
+    void setqChartView(QChartView * qChartView) { this->qChartView = qChartView; }
     void setCalFunction(valueCalFunction function) { m_function = function; }
 
 public slots:
     void axesFresh(cv::Mat);
 
 private:
-    QChartView* qGraphicsView;
+    QChartView* qChartView;
     QLineSeries* qLineSeries;
     QChart* qChart;
     valueCalFunction m_function;
+    QValueAxis* xBottomAxis;
+    QValueAxis* yLeftAxis;
+    QList<QPointF> *qList;
 };
 
 #endif // AXESFRESHTASK_H

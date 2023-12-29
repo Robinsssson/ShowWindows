@@ -19,22 +19,17 @@
  *  when drag the page pic geting error
  *
  * */
-CaptureShowTask::CaptureShowTask(QChartView * qGraphicsView, QLabel *label) {
+CaptureShowTask::CaptureShowTask(QLabel *label) {
     m_timer = nullptr;
     m_mat = new cv::Mat;
     m_label = label;
     m_fps = 1; //label 1
     qDebug() << "CaptureShowTask Constructed ID:" << QThread::currentThreadId();
-    axesFreshTask = new AxesFreshTask(qGraphicsView);
-    threadAxesFreshTask = new QThread;
+
 }
 
 CaptureShowTask::~CaptureShowTask() {
-    threadAxesFreshTask->quit();
-    threadAxesFreshTask->wait();
-    threadAxesFreshTask->deleteLater();
 
-    delete axesFreshTask;
     delete m_timer;
     delete m_mat;
     qDebug() << "CaptureShowTask Destroyed ID:" << QThread::currentThreadId();
@@ -45,10 +40,7 @@ void CaptureShowTask::getCaptureStatus(bool boolean) {
     if(m_timer == nullptr)
     {
         m_timer = new QTimer;
-        axesFreshTask->setCalFunction(ImageProcess::calGrayPercent);
         connect(m_timer, &QTimer::timeout, this, &CaptureShowTask::CaptureShow, Qt::DirectConnection);
-        connect(this, &CaptureShowTask::SendMat, axesFreshTask, &AxesFreshTask::axesFresh, Qt::AutoConnection);
-        axesFreshTask->moveToThread(threadAxesFreshTask);
     }
     if (m_videoShowFlag) {
         m_timer->start(m_fps);
@@ -56,7 +48,6 @@ void CaptureShowTask::getCaptureStatus(bool boolean) {
         m_timer->stop();
     }
 }
-
 void CaptureShowTask::CaptureShow() {
     if (SingletonMatQueue::GetInstance()->checkProcessed() == 0) {
         return;
