@@ -34,7 +34,7 @@ set(PROJECT_SOURCES
         ImageProcessTask/ImageProcessTask.h
         MatQueue/SingletonMatQueue.cpp
         MatQueue/SingletonMatQueue.h
-        ui_mainwindows.h
+
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
