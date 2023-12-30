@@ -8,6 +8,7 @@
 #include <QImage>
 #include <QPixmap>
 
+#include <QThread>
 
 /*
  * 2023/11/23 bug wait fix log
@@ -24,10 +25,12 @@ CaptureShowTask::CaptureShowTask(QLabel *label) {
     m_label = label;
     m_fps = 1; //label 1
     qDebug() << "CaptureShowTask Constructed ID:" << QThread::currentThreadId();
+
 }
 
 CaptureShowTask::~CaptureShowTask() {
-    delete m_timer;
+    if(m_timer != nullptr)
+        delete m_timer;
     delete m_mat;
     qDebug() << "CaptureShowTask Destroyed ID:" << QThread::currentThreadId();
 }
@@ -45,13 +48,13 @@ void CaptureShowTask::getCaptureStatus(bool boolean) {
         m_timer->stop();
     }
 }
-
 void CaptureShowTask::CaptureShow() {
     if (SingletonMatQueue::GetInstance()->checkProcessed() == 0) {
         return;
     }
     qDebug() <<"CaptureShowTask ID:" << QThread::currentThreadId();
     *m_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
+    emit SendMat(*m_mat);
     auto qImage = ImageProcess::cvMat2QImage(*m_mat);
     m_label->setFixedSize(qImage.size().width(), qImage.size().height());
     m_label->setPixmap(QPixmap::fromImage(qImage));

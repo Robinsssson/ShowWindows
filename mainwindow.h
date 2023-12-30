@@ -9,7 +9,7 @@
 #include <QVector>
 #include "CaptureTask/CaptureTask.h"
 #include "CaptureShowTask/CaptureShowTask.h"
-
+#include "AxesFreshTask/axesfreshtask.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -26,7 +26,7 @@ public:
     ~MainWindow() override;
 
 private:
-    static int RefreshCameraNum();
+    static std::vector<int> RefreshCameraNum();
 
     void RefreshCaptureSelect();
 
@@ -59,17 +59,17 @@ public:
 private:
     bool m_captureOpenFlag = false;
     bool m_chart_windows_status = false;
-    QGraphicsScene *m_scene;
-    QLineSeries *m_lineSeries;
-    QChart *m_chart;
     QString m_videoFileName;
     bool m_videoFileFlag = false;
     int m_fpsConfig = 1;
-    int m_captureNumber;
-    CaptureTask *m_captureTask;
+    std::vector<int> m_captureNumber;
     int m_selectedCapture = 0;
-    CaptureShowTask *m_captureShowTask;
+
+    QThread *threadAxesFreshTask;
     QThread *threadVideoShowTask;
     QThread *threadVideoTask;
+    AxesFreshTask *axesFreshTask;
+    CaptureShowTask *m_captureShowTask;
+    CaptureTask *m_captureTask;
 };
 #endif // MAINWINDOW_H

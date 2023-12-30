@@ -57,7 +57,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <widget class="QGraphicsView" name="graphicsView"/>
+           <widget class="QChartView" name="chartView"/>
           </item>
           <item>
            <widget class="QPushButton" name="pushButtonCreateChart">
@@ -69,6 +69,9 @@
          </layout>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QWidget" name="widget" native="true"/>
       </item>
       <item>
        <widget class="QTextBrowser" name="textBrowser"/>
@@ -125,6 +128,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QGraphicsView</extends>
+   <header>QtCharts</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

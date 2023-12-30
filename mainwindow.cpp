@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 #include "MatQueue/SingletonMatQueue.h"
 #include "Project_Config.h"
+#include "ImageProcess/ImageProcess.h"
 
 /* 2023/11/19
  * 线程池的设计
@@ -40,16 +41,18 @@ MainWindow::MainWindow(QWidget *parent) :
     RefreshCaptureSelect();
 
     // object Initialization
-    m_chart = new QChart;
-    m_scene = new QGraphicsScene;
+
+    threadAxesFreshTask = new QThread;
     threadVideoShowTask = new QThread;
     threadVideoTask = new QThread;
-    m_lineSeries = new QLineSeries;
+    axesFreshTask = new AxesFreshTask(ui->chartView);
     m_captureTask = new CaptureTask;
     m_captureShowTask = new CaptureShowTask(ui->VideoShow);
     m_captureShowTask->moveToThread(threadVideoShowTask);
     m_captureTask->moveToThread(threadVideoTask);
+    axesFreshTask->moveToThread(threadAxesFreshTask);
 
+    axesFreshTask->setCalFunction(ImageProcess::calGrayPercent);
     Ui_Init(ui);
     ui->textBrowser->append(tr("测试\n"));
 
@@ -63,9 +66,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, QOverload<QString>::of(&MainWindow::SendVideoFileName), m_captureTask,
             &CaptureTask::SetVideo);
     connect(this, &MainWindow::SendFpsNumber, m_captureShowTask, &CaptureShowTask::GetFpsNumber, Qt::QueuedConnection);
+    connect(m_captureShowTask, &CaptureShowTask::SendMat, axesFreshTask, &AxesFreshTask::axesFresh, Qt::QueuedConnection);
 
-    threadVideoTask->start();
-    threadVideoShowTask->start();
+    threadVideoTask->start(QThread::HighestPriority);
+    threadAxesFreshTask->start(QThread::LowPriority);
+    threadVideoShowTask->start(QThread::HighPriority);
 }
 
 void MainWindow::Ui_Init(Ui::MainWindow *_ui)
@@ -74,8 +79,7 @@ void MainWindow::Ui_Init(Ui::MainWindow *_ui)
     QImage image(480, 400, QImage::Format_RGB888);
     image.fill(QColor(Qt::black));
     _ui->VideoShow->setPixmap(QPixmap::fromImage(image));
-    _ui->graphicsView->setMinimumSize(480, 400);
-
+    _ui->chartView->setMinimumSize(480, 400);
 }
 
 MainWindow::~MainWindow() {
@@ -87,10 +91,13 @@ MainWindow::~MainWindow() {
     threadVideoTask->wait();
     threadVideoTask->deleteLater();
 
-    delete m_scene;
-    delete m_chart;
-    delete m_lineSeries;
+    threadAxesFreshTask->quit();
+    threadAxesFreshTask->wait();
+    threadAxesFreshTask->deleteLater();
+
+
     delete ui;
+    delete axesFreshTask;
     delete m_captureShowTask;
     delete m_captureTask;
 }
@@ -141,39 +148,28 @@ void MainWindow::on_actionImportVideos_triggered() {
 
 void MainWindow::on_pushButtonCreateChart_clicked() {
     if (!m_chart_windows_status) {
-        m_lineSeries->setPointsVisible(false);
-        m_lineSeries->append(1, 2);
-        m_lineSeries->append(2, 1);
-        m_lineSeries->append(3, 3);
-        m_chart->addSeries(m_lineSeries);
-        m_chart->createDefaultAxes();
-        m_chart->legend()->hide();
-        m_chart->setGeometry(0, 0, 460, 380);
-        m_scene->addItem(m_chart);
-        ui->graphicsView->setScene(m_scene);
-        ui->graphicsView->setRenderHint(QPainter::Antialiasing, true);
-        m_chart_windows_status = true;
-        ui->textBrowser->append(tr("图表开启\n"));
     } else {
 
     }
 }
 
-int MainWindow::RefreshCameraNum() {
+std::vector<int> MainWindow::RefreshCameraNum() {
     auto *tmp_capture = new cv::VideoCapture;
     int _count;
+    std::vector<int> __v;
     for (_count = 0; _count < MAX_CAPTURE_NUM; _count++) {
         tmp_capture->open(_count);
         if (!tmp_capture->isOpened())
-            break;
+            continue;
+        __v.push_back(_count);
         tmp_capture->release();//一定要释放 否则程序进程不能完全退出
     }
     delete tmp_capture;
-    return _count;
+    return __v;
 }
 
 void MainWindow::RefreshCaptureSelect() {
-    for (int _index = 0; _index < m_captureNumber; _index++) {
+    for (int _index : m_captureNumber) {
         auto *CAPTURE_ACTION_CREATE(_index) = new QAction(QString::number(_index), ui->menuCaptureSelect);
         ui->menuCaptureSelect->addAction(CAPTURE_ACTION_CREATE(_index));
         connect(CAPTURE_ACTION_CREATE(_index), QOverload<bool>::of(&::QAction::triggered),

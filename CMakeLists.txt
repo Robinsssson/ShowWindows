@@ -5,11 +5,18 @@ project(ShowWindows VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(OpenCV_DIR "C:/dev/opencv/opencv_with_qt6_build/install")
-set(CMAKE_PREFIX_PATH "C:/Qt/6.5.3/mingw_64/lib/cmake")
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(OpenCV_DIR "C:/dev/opencv/opencv_with_qt6_build/install")
+    set(CMAKE_PREFIX_PATH "C:/Qt/6.5.3/mingw_64/lib/cmake")
+    set(CMAKE_C_COMPILER "C:/Qt/Tools/mingw1120_64/bin/gcc.exe")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")
+    set(Qt_DIR "/opt/Qt/6.5.3/gcc_64/lib/cmake/Qt6")
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_C_COMPILER "C:/Qt/Tools/mingw1120_64/bin/gcc.exe")
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Charts)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Charts)
 find_package(OpenCV REQUIRED)
@@ -29,13 +36,14 @@ set(PROJECT_SOURCES
         ImageProcessTask/ImageProcessTask.h
         MatQueue/SingletonMatQueue.cpp
         MatQueue/SingletonMatQueue.h
-        ui_mainwindows.h
+
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(ShowWindows
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        AxesFreshTask/axesfreshtask.h AxesFreshTask/axesfreshtask.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET ShowWindows APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

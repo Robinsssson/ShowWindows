@@ -11,8 +11,8 @@
 class ImageProcess {
 public:
     static QImage cvMat2QImage(const cv::Mat &mat);
-
-    static cv::Mat MatTranslate(cv::Mat &);
+    static double calGrayPercent(const cv::Mat& mat);
+    static cv::Mat MatTranslate(const cv::Mat &);
 };
 
 #endif //OPENCV_PROJECT_IMAGE_PROCESS_H
