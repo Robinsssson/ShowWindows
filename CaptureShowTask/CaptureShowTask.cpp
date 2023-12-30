@@ -29,8 +29,8 @@ CaptureShowTask::CaptureShowTask(QLabel *label) {
 }
 
 CaptureShowTask::~CaptureShowTask() {
-
-    delete m_timer;
+    if(m_timer != nullptr)
+        delete m_timer;
     delete m_mat;
     qDebug() << "CaptureShowTask Destroyed ID:" << QThread::currentThreadId();
 }

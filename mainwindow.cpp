@@ -95,8 +95,9 @@ MainWindow::~MainWindow() {
     threadAxesFreshTask->wait();
     threadAxesFreshTask->deleteLater();
 
-    delete axesFreshTask;
+
     delete ui;
+    delete axesFreshTask;
     delete m_captureShowTask;
     delete m_captureTask;
 }

@@ -53,6 +53,9 @@ void AxesFreshTask::axesFresh(cv::Mat mat)
 
 AxesFreshTask::~AxesFreshTask(void)
 {
+    delete xBottomAxis;
+    delete yLeftAxis;
+    delete qList;
     delete qChart;
     delete qLineSeries;
 }

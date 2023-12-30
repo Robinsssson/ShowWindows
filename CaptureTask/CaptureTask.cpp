@@ -28,9 +28,11 @@ CaptureTask::CaptureTask() {
 
 CaptureTask::~CaptureTask() {
     qDebug() << "CaptureTask Destory ID:"<< QThread::currentThread();
-    delete m_timer;
+    if(m_timer != nullptr)
+        delete m_timer;
     delete m_capture;
     delete m_mat;
+    delete m_videoName;
 }
 
 void CaptureTask::PushMat() {
