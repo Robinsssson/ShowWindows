@@ -153,21 +153,23 @@ void MainWindow::on_pushButtonCreateChart_clicked() {
     }
 }
 
-int MainWindow::RefreshCameraNum() {
+std::vector<int> MainWindow::RefreshCameraNum() {
     auto *tmp_capture = new cv::VideoCapture;
     int _count;
+    std::vector<int> __v;
     for (_count = 0; _count < MAX_CAPTURE_NUM; _count++) {
         tmp_capture->open(_count);
         if (!tmp_capture->isOpened())
-            break;
+            continue;
+        __v.push_back(_count);
         tmp_capture->release();//一定要释放 否则程序进程不能完全退出
     }
     delete tmp_capture;
-    return _count;
+    return __v;
 }
 
 void MainWindow::RefreshCaptureSelect() {
-    for (int _index = 0; _index < m_captureNumber; _index++) {
+    for (int _index : m_captureNumber) {
         auto *CAPTURE_ACTION_CREATE(_index) = new QAction(QString::number(_index), ui->menuCaptureSelect);
         ui->menuCaptureSelect->addAction(CAPTURE_ACTION_CREATE(_index));
         connect(CAPTURE_ACTION_CREATE(_index), QOverload<bool>::of(&::QAction::triggered),

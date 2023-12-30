@@ -26,7 +26,7 @@ public:
     ~MainWindow() override;
 
 private:
-    static int RefreshCameraNum();
+    static std::vector<int> RefreshCameraNum();
 
     void RefreshCaptureSelect();
 
@@ -62,7 +62,7 @@ private:
     QString m_videoFileName;
     bool m_videoFileFlag = false;
     int m_fpsConfig = 1;
-    int m_captureNumber;
+    std::vector<int> m_captureNumber;
     int m_selectedCapture = 0;
 
     QThread *threadAxesFreshTask;

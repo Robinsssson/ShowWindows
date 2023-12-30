@@ -40,22 +40,22 @@ void AxesFreshTask::axesFresh(cv::Mat mat)
 
     qDebug() <<"axesFresh ID:" << QThread::currentThreadId();
     static int times = 0;
-    qList->append(QPointF(times++, m_function(mat)));
-    qLineSeries->clear();
-    qLineSeries->append(*qList);
     if(qList->size() > 100)
     {
         qList->pop_front();
         int n = std::ceil(qList->first().x());
         xBottomAxis->setRange(n, 100+n);
     }
+    qList->append(QPointF(times++, m_function(mat)));
+    qLineSeries->clear();
+    qLineSeries->append(*qList);
 }
 
 AxesFreshTask::~AxesFreshTask(void)
 {
+    qLineSeries->clear();
     delete xBottomAxis;
     delete yLeftAxis;
     delete qList;
     delete qChart;
-    delete qLineSeries;
 }
