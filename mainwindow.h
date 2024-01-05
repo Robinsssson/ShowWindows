@@ -1,38 +1,39 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QGraphicsScene>
 #include <QMainWindow>
 #include <QTimer>
-#include <QtCharts/QtCharts>
-#include <QtCharts/QLineSeries>
-#include <QGraphicsScene>
 #include <QVector>
-#include "CaptureTask/CaptureTask.h"
-#include "CaptureShowTask/CaptureShowTask.h"
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QtCharts>
+
 #include "AxesFreshTask/axesfreshtask.h"
+#include "CaptureShowTask/CaptureShowTask.h"
+#include "CaptureTask/CaptureTask.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui {
+class MainWindow;
+}
 QT_END_NAMESPACE
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
-
-public:
+   public:
     explicit MainWindow(QWidget *parent = nullptr);
 
     ~MainWindow() override;
 
-private:
+   private:
     static std::vector<int> RefreshCameraNum();
 
     void RefreshCaptureSelect();
 
     void Ui_Init(Ui::MainWindow *_ui);
 
-public slots:
+   public slots:
 
     void on_pushButtonOpen_clicked();
 
@@ -44,7 +45,7 @@ public slots:
 
     void on_actionFPS_triggered();
 
-signals:
+   signals:
 
     void thisCapture(int number);
 
@@ -54,9 +55,10 @@ signals:
 
     void SendFpsNumber(int);
 
-public:
+   public:
     Ui::MainWindow *ui;
-private:
+
+   private:
     bool m_captureOpenFlag = false;
     bool m_chart_windows_status = false;
     QString m_videoFileName;
@@ -72,4 +74,4 @@ private:
     CaptureShowTask *m_captureShowTask;
     CaptureTask *m_captureTask;
 };
-#endif // MAINWINDOW_H
+#endif  // MAINWINDOW_H

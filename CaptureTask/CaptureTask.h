@@ -5,22 +5,22 @@
 #ifndef OPENCVPROJECT_CAPTURETASK_H
 #define OPENCVPROJECT_CAPTURETASK_H
 
+#include <QEventLoop>
 #include <QObject>
 #include <QRunnable>
-#include <opencv2/opencv.hpp>
-#include <QTimer>
 #include <QThread>
-#include <QEventLoop>
+#include <QTimer>
+#include <opencv2/opencv.hpp>
 
 class CaptureTask : public QObject {
-Q_OBJECT
+    Q_OBJECT
 
-public:
+   public:
     CaptureTask();
 
     ~CaptureTask() override;
 
-public slots:
+   public slots:
 
     void SetVideo(const QString &string);
 
@@ -30,19 +30,17 @@ public slots:
 
     void getCaptureNumber(int number);
 
-signals:
+   signals:
 
     void SendMat(cv::Mat);
 
-private:
+   private:
     int m_captureSelect = 0;
     bool m_switchCapture = false;
     QTimer *m_timer;
     cv::VideoCapture *m_capture;
     cv::Mat *m_mat;
     std::string *m_videoName;
-
 };
 
-
-#endif //OPENCVPROJECT_CAPTURETASK_H
+#endif  // OPENCVPROJECT_CAPTURETASK_H

@@ -1,38 +1,40 @@
 #ifndef AXESFRESHTASK_H
 #define AXESFRESHTASK_H
-#include <QGraphicsView>
-#include <QObject>
-#include <QLineSeries>
 #include <QChart>
-#include <QGraphicsScene>
-#include <opencv2/opencv.hpp>
-#include <QFunctionPointer>
 #include <QChartView>
-#include <QValueAxis>
+#include <QFunctionPointer>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QLineSeries>
 #include <QList>
+#include <QObject>
 #include <QPointF>
+#include <QValueAxis>
+#include <opencv2/opencv.hpp>
 
-using valueCalFunction = double(*)(const cv::Mat&);
-class AxesFreshTask : public QObject
-{
+using valueCalFunction = double (*)(const cv::Mat &);
+class AxesFreshTask : public QObject {
     Q_OBJECT
-public:
-    explicit AxesFreshTask(QChartView * qGraphicsView, QObject *parent = nullptr);
+   public:
+    explicit AxesFreshTask(QChartView *qGraphicsView,
+                           QObject *parent = nullptr);
     ~AxesFreshTask(void);
-    void setqChartView(QChartView * qChartView) { this->qChartView = qChartView; }
+    void setqChartView(QChartView *qChartView) {
+        this->qChartView = qChartView;
+    }
     void setCalFunction(valueCalFunction function) { m_function = function; }
 
-public slots:
+   public slots:
     void axesFresh(cv::Mat);
 
-private:
-    QChartView* qChartView;
-    QLineSeries* qLineSeries;
-    QChart* qChart;
+   private:
+    QChartView *qChartView;
+    QLineSeries *qLineSeries;
+    QChart *qChart;
     valueCalFunction m_function;
-    QValueAxis* xBottomAxis;
-    QValueAxis* yLeftAxis;
+    QValueAxis *xBottomAxis;
+    QValueAxis *yLeftAxis;
     QList<QPointF> *qList;
 };
 
-#endif // AXESFRESHTASK_H
+#endif  // AXESFRESHTASK_H

@@ -1,4 +1,5 @@
 #include "axesfreshtask.h"
+
 #include <QThread>
 #include <QTime>
 
@@ -9,10 +10,9 @@
  *  bug fixed: using replot and clear to do that
  *  wait add feature: 添加方法让横坐标轴改为QTime
  ***************************************************************/
-AxesFreshTask::AxesFreshTask(QChartView * qChartView, QObject *parent)
-    : QObject{parent}
-{
-    qDebug() <<"AxesFreshTask Constructored ID:" << QThread::currentThreadId();
+AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
+    : QObject{parent} {
+    qDebug() << "AxesFreshTask Constructored ID:" << QThread::currentThreadId();
     qChart = new QChart;
     qLineSeries = new QLineSeries;
     xBottomAxis = new QValueAxis;
@@ -32,27 +32,22 @@ AxesFreshTask::AxesFreshTask(QChartView * qChartView, QObject *parent)
     qChartView->setChart(qChart);
     qChartView->setRenderHint(QPainter::Antialiasing);
     qChartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
 }
 
-void AxesFreshTask::axesFresh(cv::Mat mat)
-{
-
-    qDebug() <<"axesFresh ID:" << QThread::currentThreadId();
+void AxesFreshTask::axesFresh(cv::Mat mat) {
+    qDebug() << "axesFresh ID:" << QThread::currentThreadId();
     static int times = 0;
-    if(qList->size() > 100)
-    {
+    if (qList->size() > 100) {
         qList->pop_front();
         int n = std::ceil(qList->first().x());
-        xBottomAxis->setRange(n, 100+n);
+        xBottomAxis->setRange(n, 100 + n);
     }
     qList->append(QPointF(times++, m_function(mat)));
     qLineSeries->clear();
     qLineSeries->append(*qList);
 }
 
-AxesFreshTask::~AxesFreshTask(void)
-{
+AxesFreshTask::~AxesFreshTask(void) {
     qLineSeries->clear();
     delete xBottomAxis;
     delete yLeftAxis;

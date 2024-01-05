@@ -8,4 +8,4 @@
 extern const int MAX_CAPTURE_NUM = 10;
 #define CAPTURE_ACTION_CREATE(n) capture_action##n
 
-#endif //OPENCV_PROJECT_PROJECT_CONFIG_H
+#endif  // OPENCV_PROJECT_PROJECT_CONFIG_H
