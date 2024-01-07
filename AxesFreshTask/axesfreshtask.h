@@ -25,7 +25,8 @@ class AxesFreshTask : public QObject {
     void setCalFunction(valueCalFunction function) { m_function = function; }
 
    public slots:
-    void axesFresh(cv::Mat);
+    void axesFreshByMat(cv::Mat);
+    void axesFreshByDouble(double);
 
    private:
     QChartView *qChartView;

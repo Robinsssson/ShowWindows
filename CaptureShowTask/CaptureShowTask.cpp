@@ -57,8 +57,9 @@ void CaptureShowTask::CaptureShow() {
         return;
     }
     qDebug() << "CaptureShowTask ID:" << QThread::currentThreadId();
-    *m_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
-    emit SendMat(*m_mat);
+    auto q_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
+    m_mat = &q_mat.mat;
+    emit EmitDoubleArg(q_mat.arg);
     auto qImage = ImageProcess::GetInstance().cvMat2QImage(*m_mat);
     if (qImage.height() > m_label->maximumHeight() ||
         qImage.width() > m_label->maximumWidth())

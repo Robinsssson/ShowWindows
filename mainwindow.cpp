@@ -70,8 +70,10 @@ MainWindow::MainWindow(QWidget *parent)
             m_captureTask, &CaptureTask::SetVideo);
     connect(this, &MainWindow::SendFpsNumber, m_captureShowTask,
             &CaptureShowTask::GetFpsNumber, Qt::QueuedConnection);
-    connect(m_captureShowTask, &CaptureShowTask::SendMat, axesFreshTask,
-            &AxesFreshTask::axesFresh, Qt::QueuedConnection);
+    // connect(m_captureShowTask, &CaptureShowTask::SendMat, axesFreshTask,
+    //         &AxesFreshTask::axesFreshByMat, Qt::QueuedConnection);
+    connect(m_captureShowTask, &CaptureShowTask::EmitDoubleArg, axesFreshTask,
+            &AxesFreshTask::axesFreshByDouble, Qt::QueuedConnection);
 
     threadVideoTask->start(QThread::HighestPriority);
     threadAxesFreshTask->start(QThread::LowPriority);

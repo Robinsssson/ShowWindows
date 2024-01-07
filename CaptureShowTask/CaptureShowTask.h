@@ -27,6 +27,7 @@ class CaptureShowTask : public QObject {
 
    signals:
     void SendMat(cv::Mat);
+    void EmitDoubleArg(double);
 
    private:
     bool m_videoShowFlag{};

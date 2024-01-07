@@ -13,8 +13,6 @@
 #include <QSharedPointer>
 #include <QTime>
 #include <opencv2/opencv.hpp>
-#include <queue>
-#include <utility>
 
 struct Q_Mat {
     Q_Mat(QTime time, const cv::Mat &mat) {
@@ -22,8 +20,10 @@ struct Q_Mat {
         this->time = time;
     }
 
+    void set_arg(double arg) { this->arg = arg; }
     QTime time;
     cv::Mat mat;
+    double arg = 0;
 };
 
 class SingletonMatQueue : public QObject {
@@ -61,13 +61,20 @@ class SingletonMatQueue : public QObject {
         m_matQueueProcessed->enqueue(Q_Mat(time, mat));
     }
 
+    void enqueueProcessedWithArg(const cv::Mat &mat, const QTime &time,
+                                 double arg) {
+        auto q_mat = Q_Mat(time, mat);
+        q_mat.set_arg(arg);
+        m_matQueueProcessed->enqueue(q_mat);
+    }
+
     Q_Mat dequeueNotProcessed() {
         if (m_matQueueNotProcessed->isEmpty())
             return m_matQueueNotProcessed->head();
         return m_matQueueNotProcessed->dequeue();
     }
 
-    cv::Mat dequeueProcessed() { return m_matQueueProcessed->dequeue().mat; }
+    Q_Mat dequeueProcessed() { return m_matQueueProcessed->dequeue(); }
 
     long long checkNotProcessed() { return m_matQueueNotProcessed->size(); }
 

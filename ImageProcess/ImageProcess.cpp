@@ -42,22 +42,26 @@ QImage ImageProcess::cvMat2QImage(const cv::Mat &mat) {
     }
 }
 
-cv::Mat ImageProcess::MatTranslate(cv::Mat &mat) {
+double ImageProcess::MatTranslate(cv::Mat &mat) {
     cv::Mat fgmask;
     fgbg->apply(mat, fgmask);
     cv::morphologyEx(fgmask, fgmask, cv::MORPH_OPEN, kernel);
     cv::morphologyEx(fgmask, fgmask, cv::MORPH_CLOSE, kernel);
     std::vector<std::vector<cv::Point>> contours;
     std::vector<cv::Vec4i> hierarchy;
-
-    cv::findContours(fgmask, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    cv::findContours(fgmask, contours, hierarchy, cv::RETR_EXTERNAL,
+                     cv::CHAIN_APPROX_SIMPLE);
+    if (contours.empty()) return 0;
     double max = 0.0;
     int member = 0;
-    auto maxCon = std::max_element(contours.begin(), contours.end(), [](const std::vector<cv::Point>& v1, const std::vector<cv::Point>& v2){
-        return cv::contourArea(v1) < cv::contourArea(v2);
-    });
-    cv::rectangle(mat, cv::boundingRect(*maxCon), cv::Scalar(255, 255, 0), 2);
-    return mat;
+    auto maxCon = std::max_element(
+        contours.begin(), contours.end(),
+        [](const std::vector<cv::Point> &v1, const std::vector<cv::Point> &v2) {
+            return cv::contourArea(v1) < cv::contourArea(v2);
+        });
+    auto rect = cv::boundingRect(*maxCon);
+    cv::rectangle(mat, rect, cv::Scalar(255, 255, 0), 2);
+    return rect.x + rect.width * 0.5;
 }
 
 double ImageProcess::calGrayPercent(const cv::Mat &mat) {

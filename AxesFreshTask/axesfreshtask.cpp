@@ -19,7 +19,7 @@ AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
     yLeftAxis = new QValueAxis;
     qList = new QList<QPointF>;
     xBottomAxis->setRange(0, 100);
-    yLeftAxis->setRange(0, 255);
+    yLeftAxis->setRange(0, 1000);
 
     setqChartView(qChartView);
     qChart->addSeries(qLineSeries);
@@ -28,13 +28,13 @@ AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
     qLineSeries->attachAxis(xBottomAxis);
     qLineSeries->attachAxis(yLeftAxis);
     qChart->legend()->hide();
-    qChart->setTitle(tr("灰度值"));
+    qChart->setTitle(tr("x0变化值"));
     qChartView->setChart(qChart);
     qChartView->setRenderHint(QPainter::Antialiasing);
     qChartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
-void AxesFreshTask::axesFresh(cv::Mat mat) {
+void AxesFreshTask::axesFreshByMat(cv::Mat mat) {
     qDebug() << "axesFresh ID:" << QThread::currentThreadId();
     static int times = 0;
     if (qList->size() > 100) {
@@ -47,6 +47,17 @@ void AxesFreshTask::axesFresh(cv::Mat mat) {
     qLineSeries->append(*qList);
 }
 
+void AxesFreshTask::axesFreshByDouble(double arg) {
+    static int times = 0;
+    if (qList->size() > 100) {
+        qList->pop_front();
+        int n = std::ceil(qList->first().x());
+        xBottomAxis->setRange(n, 100 + n);
+    }
+    qList->append(QPointF(times++, arg));
+    qLineSeries->clear();
+    qLineSeries->append(*qList);
+}
 AxesFreshTask::~AxesFreshTask(void) {
     qLineSeries->clear();
     delete xBottomAxis;
