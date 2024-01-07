@@ -46,6 +46,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         AxesFreshTask/axesfreshtask.h AxesFreshTask/axesfreshtask.cpp
         .clang-format
         clang-format.py
+        BugLog.md
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET ShowWindows APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
