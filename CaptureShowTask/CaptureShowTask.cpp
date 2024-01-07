@@ -26,7 +26,6 @@
  * */
 CaptureShowTask::CaptureShowTask(QLabel *label) {
     m_timer = nullptr;
-    m_mat = new cv::Mat;
     m_label = label;
     m_fps = 1;  // label 1
     qDebug() << "CaptureShowTask Constructed ID:" << QThread::currentThreadId();
@@ -34,7 +33,6 @@ CaptureShowTask::CaptureShowTask(QLabel *label) {
 
 CaptureShowTask::~CaptureShowTask() {
     if (m_timer != nullptr) delete m_timer;
-    delete m_mat;
     qDebug() << "CaptureShowTask Destroyed ID:" << QThread::currentThreadId();
 }
 
