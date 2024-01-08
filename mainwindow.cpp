@@ -182,11 +182,12 @@ void MainWindow::RefreshCaptureSelect() {
             new QAction(QString::number(_index), ui->menuCaptureSelect);
         ui->menuCaptureSelect->addAction(CAPTURE_ACTION_CREATE(_index));
         connect(CAPTURE_ACTION_CREATE(_index),
-                QOverload<bool>::of(&::QAction::triggered), [=](bool) {
+                QOverload<bool>::of(&::QAction::triggered),this, [=](bool) {
                     MainWindow::m_selectedCapture = _index;
                     ui->textBrowser->append(tr("摄像头") +
                                             QString::number(m_selectedCapture) +
                                             tr("启用\n"));
+                    on_pushButtonClose_clicked();
                     emit thisCapture(m_selectedCapture);
                 });
     }
