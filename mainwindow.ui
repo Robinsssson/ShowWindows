@@ -86,20 +86,20 @@
      <x>0</x>
      <y>0</y>
      <width>1050</width>
-     <height>21</height>
+     <height>17</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuCaptureSelect">
+   <widget class="QMenu" name="menuImportVideo">
     <property name="title">
      <string>Start</string>
     </property>
-    <widget class="QMenu" name="menuImportVideo">
+    <widget class="QMenu" name="menuCaptureSelect">
      <property name="title">
       <string>ImportVideo</string>
      </property>
      <addaction name="actionDefault"/>
     </widget>
-    <addaction name="menuImportVideo"/>
+    <addaction name="menuCaptureSelect"/>
     <addaction name="actionImportVideos"/>
    </widget>
    <widget class="QMenu" name="menuSetting">
@@ -108,7 +108,7 @@
     </property>
     <addaction name="actionFPS"/>
    </widget>
-   <addaction name="menuCaptureSelect"/>
+   <addaction name="menuImportVideo"/>
    <addaction name="menuSetting"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
