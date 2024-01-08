@@ -164,7 +164,11 @@ std::vector<int> MainWindow::RefreshCameraNum() {
     std::vector<int> __v;
     for (_count = 0; _count < MAX_CAPTURE_NUM; _count++) {
         tmp_capture->open(_count);
-        if (!tmp_capture->isOpened()) continue;
+        if (!tmp_capture->isOpened())
+        {
+            tmp_capture->release();
+            continue;
+        }
         __v.push_back(_count);
         tmp_capture->release();  // 一定要释放 否则程序进程不能完全退出
     }
