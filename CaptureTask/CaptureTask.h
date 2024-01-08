@@ -30,11 +30,14 @@ class CaptureTask : public QObject {
 
     void getCaptureNumber(int number);
 
+    void GetFpsNumber(int fps) { m_fps = fps; };
+
    signals:
 
     void SendMat(cv::Mat);
 
    private:
+    int m_fps = 1;
     int m_captureSelect = 0;
     bool m_switchCapture = false;
     QTimer *m_timer;

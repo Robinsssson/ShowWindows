@@ -15,8 +15,6 @@
 /*2023/11/23 Bug log
  *   打开视频然后退出软件之后，CaptureTask退出异常
  *   bug fixed... but haven't do anything..
- *
- *
  * */
 CaptureTask::CaptureTask() {
     m_timer = nullptr;
@@ -73,8 +71,7 @@ void CaptureTask::getCaptureStatus(bool boolean) {
                 Qt::DirectConnection);
     }
     if (m_switchCapture) {
-        m_timer->start(1);
-
+        m_timer->start(m_fps);
         if (m_captureSelect == -1)
             m_capture->open(*m_videoName);
         else
@@ -89,6 +86,8 @@ void CaptureTask::getCaptureStatus(bool boolean) {
     } else {
         m_timer->stop();
         m_capture->release();
+        QThreadPool::globalInstance()->releaseThread();
+        SingletonMatQueue::GetInstance()->ClearAllQueue();
     }
 }
 

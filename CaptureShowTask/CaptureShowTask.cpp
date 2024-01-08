@@ -52,6 +52,7 @@ void CaptureShowTask::getCaptureStatus(bool boolean) {
 
 void CaptureShowTask::CaptureShow() {
     if (SingletonMatQueue::GetInstance()->checkProcessed() == 0) {
+        // emit SingletonMatError();
         return;
     }
     qDebug() << "CaptureShowTask ID:" << QThread::currentThreadId();

@@ -33,7 +33,7 @@ AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
     qChartView->setRenderHint(QPainter::Antialiasing);
     qChartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
-
+// not use
 void AxesFreshTask::axesFreshByMat(cv::Mat mat) {
     qDebug() << "axesFresh ID:" << QThread::currentThreadId();
     static int times = 0;
@@ -58,6 +58,7 @@ void AxesFreshTask::axesFreshByDouble(double arg) {
     qLineSeries->clear();
     qLineSeries->append(*qList);
 }
+
 AxesFreshTask::~AxesFreshTask(void) {
     qLineSeries->clear();
     delete xBottomAxis;

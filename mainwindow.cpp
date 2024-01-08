@@ -70,10 +70,16 @@ MainWindow::MainWindow(QWidget *parent)
             m_captureTask, &CaptureTask::SetVideo);
     connect(this, &MainWindow::SendFpsNumber, m_captureShowTask,
             &CaptureShowTask::GetFpsNumber, Qt::QueuedConnection);
-    // connect(m_captureShowTask, &CaptureShowTask::SendMat, axesFreshTask,
-    //         &AxesFreshTask::axesFreshByMat, Qt::QueuedConnection);
+    connect(this, &MainWindow::SendFpsNumber, m_captureTask,
+            &CaptureTask::GetFpsNumber, Qt::QueuedConnection);
     connect(m_captureShowTask, &CaptureShowTask::EmitDoubleArg, axesFreshTask,
             &AxesFreshTask::axesFreshByDouble, Qt::QueuedConnection);
+    connect(m_captureShowTask, &CaptureShowTask::SingletonMatError, this,
+            [this]() {
+                QMessageBox::warning(this, tr("singleton mat crushed"),
+                                     tr("restart the application"));
+                SingletonMatQueue::GetInstance()->ClearAllQueue();
+            });
 
     threadVideoTask->start(QThread::HighestPriority);
     threadAxesFreshTask->start(QThread::LowPriority);
@@ -120,7 +126,6 @@ void MainWindow::on_pushButtonClose_clicked() {
     m_captureOpenFlag = false;
     emit switchCapture(m_captureOpenFlag);
     m_videoFileFlag = false;
-    QThreadPool::globalInstance();
     QImage image(480, 400, QImage::Format_RGB888);
     image.fill(QColor(Qt::black));
     ui->VideoShow->setFixedSize(480, 400);
@@ -136,6 +141,7 @@ void MainWindow::on_actionFPS_triggered() {
         QMessageBox::warning(this, tr("非法输入"), tr("输入值无效！"));
     ui->textBrowser->append("FPS:" + QString::number(m_fpsConfig) + '\n');
     emit SendFpsNumber(m_fpsConfig);
+    on_pushButtonClose_clicked();
 }
 
 void MainWindow::on_actionImportVideos_triggered() {
@@ -150,11 +156,7 @@ void MainWindow::on_actionImportVideos_triggered() {
     m_videoFileFlag = true;
 }
 
-void MainWindow::on_pushButtonCreateChart_clicked() {
-    if (!m_chart_windows_status) {
-    } else {
-    }
-}
+void MainWindow::on_pushButtonCreateChart_clicked() {}
 
 std::vector<int> MainWindow::RefreshCameraNum() {
     auto *tmp_capture = new cv::VideoCapture;

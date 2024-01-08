@@ -80,6 +80,11 @@ class SingletonMatQueue : public QObject {
 
     long long checkProcessed() { return m_matQueueProcessed->size(); }
 
+    void ClearAllQueue() {
+        m_matQueueNotProcessed->clear();
+        m_matQueueProcessed->clear();
+    }
+
    private:
     static QMutex m_mutex;
     static QSharedPointer<SingletonMatQueue> m_instance;
