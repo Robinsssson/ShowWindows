@@ -19,7 +19,7 @@ QImage ImageProcess::cvMat2QImage(const cv::Mat &mat) {
             memcpy(pDest, pSrc, mat.cols);
             pSrc += mat.step;
         }
-        return image;
+        return image.copy();
     }
     // 8-bits unsigned, NO. OF CHANNELS = 3
     else if (mat.type() == CV_8UC3) {

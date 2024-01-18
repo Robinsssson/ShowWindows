@@ -20,7 +20,6 @@ CaptureTask::CaptureTask() {
     m_timer = nullptr;
     m_capture = new cv::VideoCapture;
     m_mat = new cv::Mat;
-    m_videoName = new std::string;
     m_captureSelect = 0;
     qDebug() << "CaptureTask Constructor ID:" << QThread::currentThreadId();
 }
@@ -30,7 +29,6 @@ CaptureTask::~CaptureTask() {
     if (m_timer != nullptr) delete m_timer;
     delete m_capture;
     delete m_mat;
-    delete m_videoName;
 }
 
 void CaptureTask::PushMat() {
@@ -73,7 +71,7 @@ void CaptureTask::getCaptureStatus(bool boolean) {
     if (m_switchCapture) {
         m_timer->start(m_fps);
         if (m_captureSelect == -1)
-            m_capture->open(*m_videoName);
+            m_capture->open(m_videoName);
         else
             m_capture->open(m_captureSelect);
         if (!m_capture->isOpened()) {
@@ -92,7 +90,8 @@ void CaptureTask::getCaptureStatus(bool boolean) {
 }
 
 void CaptureTask::SetVideo(const QString &string) {
-    *m_videoName = string.toStdString();
+    m_videoName = string.toStdString();
+    qDebug() << m_videoName;
     m_captureSelect = -1;
     getCaptureStatus(false);
 }

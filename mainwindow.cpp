@@ -145,13 +145,14 @@ void MainWindow::on_actionFPS_triggered() {
 }
 
 void MainWindow::on_actionImportVideos_triggered() {
-    m_videoFileName = QFileDialog::getOpenFileName(
+    m_videoFileName = QFileDialog::getOpenFileName( //C:/Projects/VSC_Proj/Python/OpenCV_Project/motion.avi
         this, tr("打开视频文件"), "C:/",
         tr("video files(*.avi *mp4);;All files(*.*)"));
     if (m_videoFileName.isEmpty()) {
         QMessageBox::warning(this, "Warning", "Failed to find");
         return;
     }
+    ui->textBrowser->append(m_videoFileName);
     emit SendVideoFileName(m_videoFileName);
     m_videoFileFlag = true;
 }

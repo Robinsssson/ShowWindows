@@ -43,7 +43,7 @@ class CaptureTask : public QObject {
     QTimer *m_timer;
     cv::VideoCapture *m_capture;
     cv::Mat *m_mat;
-    std::string *m_videoName;
+    std::string m_videoName;
 };
 
 #endif  // OPENCVPROJECT_CAPTURETASK_H
