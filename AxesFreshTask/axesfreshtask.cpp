@@ -1,5 +1,4 @@
 #include "axesfreshtask.h"
-
 #include <QThread>
 #include <QTime>
 
@@ -34,18 +33,18 @@ AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
     qChartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 // not use
-void AxesFreshTask::axesFreshByMat(cv::Mat mat) {
-    qDebug() << "axesFresh ID:" << QThread::currentThreadId();
-    static int times = 0;
-    if (qList->size() > 100) {
-        qList->pop_front();
-        int n = std::ceil(qList->first().x());
-        xBottomAxis->setRange(n, 100 + n);
-    }
-    qList->append(QPointF(times++, m_function(mat)));
-    qLineSeries->clear();
-    qLineSeries->append(*qList);
-}
+// void AxesFreshTask::axesFreshByMat(cv::Mat mat) {
+//     qDebug() << "axesFresh ID:" << QThread::currentThreadId();
+//     static int times = 0;
+//     if (qList->size() > 100) {
+//         qList->pop_front();
+//         int n = std::ceil(qList->first().x());
+//         xBottomAxis->setRange(n, 100 + n);
+//     }
+//     qList->append(QPointF(times++, m_function(mat)));
+//     qLineSeries->clear();
+//     qLineSeries->append(*qList);
+// }
 
 void AxesFreshTask::axesFreshByDouble(double arg) {
     static int times = 0;

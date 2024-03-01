@@ -36,14 +36,15 @@ set(PROJECT_SOURCES
         ImageProcessTask/ImageProcessTask.h
         MatQueue/SingletonMatQueue.cpp
         MatQueue/SingletonMatQueue.h
-
+        AxesFreshTask/axesfreshtask.h
+        AxesFreshTask/axesfreshtask.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(ShowWindows
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        AxesFreshTask/axesfreshtask.h AxesFreshTask/axesfreshtask.cpp
+
         .clang-format
         clang-format.py
         BugLog.md

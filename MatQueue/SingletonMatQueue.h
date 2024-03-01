@@ -31,9 +31,6 @@ class SingletonMatQueue : public QObject {
 
    public:
     SingletonMatQueue() {
-        m_matQueueNotProcessed =
-            QSharedPointer<QQueue<Q_Mat>>(new QQueue<Q_Mat>);
-        m_matQueueProcessed = QSharedPointer<QQueue<Q_Mat>>(new QQueue<Q_Mat>);
     }
 
     ~SingletonMatQueue() override = default;
@@ -43,53 +40,67 @@ class SingletonMatQueue : public QObject {
     SingletonMatQueue &operator=(const SingletonMatQueue &) = delete;
 
    public:
-    static QSharedPointer<SingletonMatQueue> &GetInstance() {
-        if (m_instance.isNull()) {
+    static SingletonMatQueue *GetInstance() {
+        if (m_instance == NULL) {
             QMutexLocker mutexLocker(&m_mutex);
-            if (m_instance.isNull())
-                m_instance =
-                    QSharedPointer<SingletonMatQueue>(new SingletonMatQueue);
+            if (m_instance == NULL)
+                m_instance = new SingletonMatQueue();
         }
         return m_instance;
     }
 
     void enqueueNotProcessed(const cv::Mat &mat, const QTime &time) {
-        m_matQueueNotProcessed->enqueue(Q_Mat(time, mat));
+        QMutexLocker mutexLocker(&m_mutex);
+        m_matQueueNotProcessed.enqueue(Q_Mat(time, mat));
     }
 
     void enqueueProcessed(const cv::Mat &mat, const QTime &time) {
-        m_matQueueProcessed->enqueue(Q_Mat(time, mat));
+        QMutexLocker mutexLocker(&m_mutex);
+        m_matQueueProcessed.enqueue(Q_Mat(time, mat));
     }
 
     void enqueueProcessedWithArg(const cv::Mat &mat, const QTime &time,
                                  double arg) {
+        QMutexLocker mutexLocker(&m_mutex);
         auto q_mat = Q_Mat(time, mat);
         q_mat.set_arg(arg);
-        m_matQueueProcessed->enqueue(q_mat);
+        m_matQueueProcessed.enqueue(q_mat);
     }
 
     Q_Mat dequeueNotProcessed() {
-        if (m_matQueueNotProcessed->isEmpty())
-            return m_matQueueNotProcessed->head();
-        return m_matQueueNotProcessed->dequeue();
+        QMutexLocker mutexLocker(&m_mutex);
+        if (m_matQueueNotProcessed.isEmpty())
+            return m_matQueueNotProcessed.head();
+        return m_matQueueNotProcessed.dequeue();
     }
 
-    Q_Mat dequeueProcessed() { return m_matQueueProcessed->dequeue(); }
+    Q_Mat dequeueProcessed() {
+        QMutexLocker mutexLocker(&m_mutex);
+        if (m_matQueueProcessed.isEmpty())
+            return m_matQueueProcessed.head();
+        return m_matQueueProcessed.dequeue();
+    }
 
-    long long checkNotProcessed() { return m_matQueueNotProcessed->size(); }
+    long long checkNotProcessed() {
+        QMutexLocker mutexLocker(&m_mutex);
+        return m_matQueueNotProcessed.size(); }
 
-    long long checkProcessed() { return m_matQueueProcessed->size(); }
+    long long checkProcessed() {
+        QMutexLocker mutexLocker(&m_mutex);
+        return m_matQueueProcessed.size();
+    }
 
     void ClearAllQueue() {
-        m_matQueueNotProcessed->clear();
-        m_matQueueProcessed->clear();
+        QMutexLocker mutexLocker(&m_mutex);
+        m_matQueueNotProcessed.clear();
+        m_matQueueProcessed.clear();
     }
 
    private:
     static QMutex m_mutex;
-    static QSharedPointer<SingletonMatQueue> m_instance;
-    QSharedPointer<QQueue<Q_Mat>> m_matQueueNotProcessed;
-    QSharedPointer<QQueue<Q_Mat>> m_matQueueProcessed;  // 改成优先队列
+    static SingletonMatQueue* m_instance;
+    QQueue<Q_Mat> m_matQueueNotProcessed;
+    QQueue<Q_Mat> m_matQueueProcessed;  // 改成优先队列
 };
 
 #endif  // OPENCVPROJECT_SINGLETONMATQUEUE_H

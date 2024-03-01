@@ -5,41 +5,54 @@
 
 #include <QDebug>
 
-QImage ImageProcess::cvMat2QImage(const cv::Mat &mat) {
-    // 8-bits unsigned, NO. OF CHANNELS = 1
-    if (mat.type() == CV_8UC1) {
-        QImage image(mat.cols, mat.rows, QImage::Format_Indexed8);
-        image.setColorCount(256);
-        for (int i = 0; i < 256; i++) {
-            image.setColor(i, qRgb(i, i, i));
+QImage ImageProcess::cvMatToQImage(const cv::Mat &inMat) {
+    switch (inMat.type()) {
+        // 8-bit, 4 channel
+        case CV_8UC4: {
+            QImage image(inMat.data, inMat.cols, inMat.rows,
+                         static_cast<int>(inMat.step), QImage::Format_ARGB32);
+
+            return image;
         }
-        uchar *pSrc = mat.data;
-        for (int row = 0; row < mat.rows; row++) {
-            uchar *pDest = image.scanLine(row);
-            memcpy(pDest, pSrc, mat.cols);
-            pSrc += mat.step;
+        // 8-bit, 3 channel
+        case CV_8UC3: {
+            QImage image(inMat.data, inMat.cols, inMat.rows,
+                         static_cast<int>(inMat.step), QImage::Format_RGB888);
+
+            return image.rgbSwapped();
         }
-        return image.copy();
+        // 8-bit, 1 channel
+        case CV_8UC1: {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 5, 0)
+            QImage image(inMat.data, inMat.cols, inMat.rows,
+                         static_cast<int>(inMat.step),
+                         QImage::Format_Grayscale8);
+#else
+            static QVector<QRgb> sColorTable;
+
+            // only create our color table the first time
+            if (sColorTable.isEmpty()) {
+                sColorTable.resize(256);
+
+                for (int i = 0; i < 256; ++i) {
+                    sColorTable[i] = qRgb(i, i, i);
+                }
+            }
+
+            QImage image(inMat.data, inMat.cols, inMat.rows,
+                         static_cast<int>(inMat.step), QImage::Format_Indexed8);
+
+            image.setColorTable(sColorTable);
+#endif
+            return image;
+        }
+        default:
+            qWarning() << "ASM::cvMatToQImage() - cv::Mat image type not "
+                          "handled in switch:"
+                       << inMat.type();
+            break;
     }
-    // 8-bits unsigned, NO. OF CHANNELS = 3
-    else if (mat.type() == CV_8UC3) {
-        // Copy input Mat
-        cv::cvtColor(mat, mat, cv::COLOR_BGR2RGB);
-        const auto *pSrc = (const uchar *)mat.data;
-        QImage image(pSrc, mat.cols, mat.rows, (qsizetype)mat.step,
-                     QImage::Format_RGB888);
-        // image = image.rgbSwapped();
-        return image.copy();
-    } else if (mat.type() == CV_8UC4) {
-        const auto *pSrc = (const uchar *)mat.data;
-        QImage image(pSrc, mat.cols, mat.rows, (qsizetype)mat.step,
-                     QImage::Format_ARGB32);
-        return image.copy();
-    } else {
-        qDebug() << "ERROR: Mat could not be converted to QImage.";
-        QImage image;
-        return image.copy();
-    }
+    return QImage();
 }
 
 double ImageProcess::MatTranslate(cv::Mat &mat) {

@@ -9,7 +9,7 @@
 #include <QTimer>
 #include <opencv2/opencv.hpp>
 
-#include "../ImageProcessTask/ImageProcessTask.h"
+#include "../ImageProcess/ImageProcess.h"
 #include "../MatQueue/SingletonMatQueue.h"
 
 /*2023/11/23 Bug log
@@ -31,30 +31,21 @@ CaptureTask::~CaptureTask() {
     delete m_mat;
 }
 
+//Bug in there.
 void CaptureTask::PushMat() {
     qDebug() << "CaptureTask ID:" << QThread::currentThreadId();
     if (!m_capture->read(*m_mat)) {
+        if(m_captureSelect == -1)
+            emit VideoOver();
         getCaptureStatus(false);
     } else {
         SingletonMatQueue::GetInstance()->enqueueNotProcessed(
             *m_mat, QTime::currentTime());
         if (SingletonMatQueue::GetInstance()->checkNotProcessed() > 0) {
-            if (SingletonMatQueue::GetInstance()->checkProcessed() > 30) return;
-            QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-            if (SingletonMatQueue::GetInstance()->checkProcessed() < 5 &&
-                SingletonMatQueue::GetInstance()->checkNotProcessed() > 5) {
-                QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-                QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-                QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-                QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-            }
-            if (SingletonMatQueue::GetInstance()->checkProcessed() < 2 &&
-                SingletonMatQueue::GetInstance()->checkNotProcessed() > 10) {
-                QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-                QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-                QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-                QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-            }
+            // QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
+            Q_Mat q_mat = SingletonMatQueue::GetInstance()->dequeueNotProcessed();
+            double num = ImageProcess::GetInstance().MatTranslate(q_mat.mat);
+            SingletonMatQueue::GetInstance()->enqueueProcessedWithArg(q_mat.mat, q_mat.time, num);
         }
     }
 }
@@ -70,10 +61,17 @@ void CaptureTask::getCaptureStatus(bool boolean) {
     }
     if (m_switchCapture) {
         m_timer->start(m_fps);
-        if (m_captureSelect == -1)
+        if (m_captureSelect == -1) {
             m_capture->open(m_videoName);
-        else
+            cv::Mat mat;
+            m_capture->read(mat);
+            qDebug() << mat.type();
+        } else {
             m_capture->open(m_captureSelect);
+            cv::Mat mat;
+            m_capture->read(mat);
+            qDebug() << mat.type();
+        }
         if (!m_capture->isOpened()) {
             QMessageBox::warning(
                 nullptr, tr("My Application"),

@@ -5,4 +5,4 @@
 #include "SingletonMatQueue.h"
 
 QMutex SingletonMatQueue::m_mutex;
-QSharedPointer<SingletonMatQueue> SingletonMatQueue::m_instance;
+SingletonMatQueue *SingletonMatQueue::m_instance;

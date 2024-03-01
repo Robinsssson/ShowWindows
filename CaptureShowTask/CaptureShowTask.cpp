@@ -49,7 +49,6 @@ void CaptureShowTask::getCaptureStatus(bool boolean) {
         m_timer->stop();
     }
 }
-
 void CaptureShowTask::CaptureShow() {
     if (SingletonMatQueue::GetInstance()->checkProcessed() == 0) {
         // emit SingletonMatError();
@@ -57,9 +56,9 @@ void CaptureShowTask::CaptureShow() {
     }
     qDebug() << "CaptureShowTask ID:" << QThread::currentThreadId();
     auto q_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
-    m_mat = &q_mat.mat;
+    cv::Mat mat = q_mat.mat;
     emit EmitDoubleArg(q_mat.arg);
-    auto qImage = ImageProcess::GetInstance().cvMat2QImage(*m_mat);
+    auto qImage = ImageProcess::GetInstance().cvMatToQImage(mat);
     if (qImage.height() > m_label->maximumHeight() ||
         qImage.width() > m_label->maximumWidth())
         qImage = qImage.scaled(m_label->maximumSize());

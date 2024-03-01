@@ -34,6 +34,8 @@ class CaptureTask : public QObject {
 
    signals:
 
+    void VideoOver();
+
     void SendMat(cv::Mat);
 
    private:

@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 
 #include "./ui_mainwindow.h"
-#include "ImageProcess/ImageProcess.h"
 #include "MatQueue/SingletonMatQueue.h"
 #include "Project_Config.h"
 
@@ -52,8 +51,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_captureShowTask->moveToThread(threadVideoShowTask);
     m_captureTask->moveToThread(threadVideoTask);
     axesFreshTask->moveToThread(threadAxesFreshTask);
-
-    axesFreshTask->setCalFunction(ImageProcess::calGrayPercent);
     Ui_Init(ui);
     ui->textBrowser->append(tr("测试\n"));
 
@@ -74,6 +71,10 @@ MainWindow::MainWindow(QWidget *parent)
             &CaptureTask::GetFpsNumber, Qt::QueuedConnection);
     connect(m_captureShowTask, &CaptureShowTask::EmitDoubleArg, axesFreshTask,
             &AxesFreshTask::axesFreshByDouble, Qt::QueuedConnection);
+    connect(m_captureTask, &CaptureTask::VideoOver, this, [this]()
+            {
+        on_pushButtonClose_clicked();
+    });
     connect(m_captureShowTask, &CaptureShowTask::SingletonMatError, this,
             [this]() {
                 QMessageBox::warning(this, tr("singleton mat crushed"),
@@ -108,10 +109,10 @@ MainWindow::~MainWindow() {
     threadAxesFreshTask->wait();
     threadAxesFreshTask->deleteLater();
 
-    delete ui;
     delete axesFreshTask;
     delete m_captureShowTask;
     delete m_captureTask;
+    delete ui;
 }
 
 void MainWindow::on_pushButtonOpen_clicked() {
