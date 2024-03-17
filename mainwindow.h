@@ -68,6 +68,7 @@ class MainWindow : public QMainWindow {
     int m_selectedCapture = 0;
 
     QThread *threadAxesFreshTask;
+    QThread *threadFftFreshTask;
     QThread *threadVideoShowTask;
     QThread *threadVideoTask;
     AxesFreshTask *axesFreshTask;

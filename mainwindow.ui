@@ -60,18 +60,11 @@
            <widget class="QChartView" name="chartView"/>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButtonCreateChart">
-            <property name="text">
-             <string>绘制图表</string>
-            </property>
-           </widget>
+           <widget class="QChartView" name="fftView"/>
           </item>
          </layout>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QWidget" name="widget" native="true"/>
       </item>
       <item>
        <widget class="QTextBrowser" name="textBrowser"/>
@@ -132,7 +125,7 @@
   <customwidget>
    <class>QChartView</class>
    <extends>QGraphicsView</extends>
-   <header>QtCharts</header>
+   <header location="global">QtCharts</header>
   </customwidget>
  </customwidgets>
  <resources/>

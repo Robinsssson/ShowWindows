@@ -19,7 +19,7 @@ AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
     qList = new QList<QPointF>;
     xBottomAxis->setRange(0, 100);
     yLeftAxis->setRange(0, 1000);
-
+    csv_file = new QFile("data_cache.csv");
     setqChartView(qChartView);
     qChart->addSeries(qLineSeries);
     qChart->addAxis(yLeftAxis, Qt::AlignLeft);
@@ -31,6 +31,13 @@ AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
     qChartView->setChart(qChart);
     qChartView->setRenderHint(QPainter::Antialiasing);
     qChartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    if(csv_file->open(QIODevice::WriteOnly)){
+        QString str;
+        QTextStream(&str) << "times" << "," << "arg" << Qt::endl;
+        csv_file->write(str.toUtf8());
+    }
+    csv_file->close();
 }
 // not use
 // void AxesFreshTask::axesFreshByMat(cv::Mat mat) {
@@ -50,12 +57,18 @@ void AxesFreshTask::axesFreshByDouble(double arg) {
     static int times = 0;
     if (qList->size() > 100) {
         qList->pop_front();
-        int n = std::ceil(qList->first().x());
+        int n = std::ceil(qList->first().x()); // ?
         xBottomAxis->setRange(n, 100 + n);
     }
     qList->append(QPointF(times++, arg));
     qLineSeries->clear();
     qLineSeries->append(*qList);
+    if(csv_file->open(QIODevice::Append)){
+        QString str;
+        QTextStream(&str) << times << "," << arg << Qt::endl;
+        csv_file->write(str.toUtf8());
+    }
+    csv_file->close();
 }
 
 AxesFreshTask::~AxesFreshTask(void) {
@@ -64,4 +77,6 @@ AxesFreshTask::~AxesFreshTask(void) {
     delete yLeftAxis;
     delete qList;
     delete qChart;
+    csv_file->close();
+    delete csv_file;
 }

@@ -44,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     // object Initialization
     threadAxesFreshTask = new QThread;
     threadVideoShowTask = new QThread;
+    threadFftFreshTask = new QThread;
     threadVideoTask = new QThread;
     axesFreshTask = new AxesFreshTask(ui->chartView);
     m_captureTask = new CaptureTask;

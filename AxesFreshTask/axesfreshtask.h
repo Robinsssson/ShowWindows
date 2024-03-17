@@ -10,6 +10,7 @@
 #include <QObject>
 #include <QPointF>
 #include <QValueAxis>
+#include <QFile>
 #include <opencv2/opencv.hpp>
 
 class AxesFreshTask : public QObject {
@@ -33,6 +34,8 @@ class AxesFreshTask : public QObject {
     QValueAxis *xBottomAxis;
     QValueAxis *yLeftAxis;
     QList<QPointF> *qList;
+    QFile *csv_file;
+
 };
 
 #endif  // AXESFRESHTASK_H
