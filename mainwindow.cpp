@@ -1,9 +1,9 @@
 #include "mainwindow.h"
-
+#include "settingconfig.h"
 #include "./ui_mainwindow.h"
 #include "MatQueue/SingletonMatQueue.h"
 #include "Project_Config.h"
-
+#include "ImageProcess/ImageProcess.h"
 /* 2023/11/19
  * 线程池的设计
  *  1.此项目涉及到 图像采集 图像处理 图像展示 数据表格展示
@@ -54,12 +54,15 @@ MainWindow::MainWindow(QWidget *parent)
     axesFreshTask->moveToThread(threadAxesFreshTask);
     Ui_Init(ui);
     ui->textBrowser->append(tr("测试\n"));
-
+    m_settingDialog = new SettingConfig(this);
     SingletonMatQueue::GetInstance();
 
     // connect
+    connect(m_captureShowTask, &CaptureShowTask::changeAxesWithAlg, axesFreshTask, &AxesFreshTask::changeAxesWithAlgSlot, Qt::QueuedConnection);
     connect(this, QOverload<int>::of(&MainWindow::thisCapture), m_captureTask,
             &CaptureTask::getCaptureNumber);
+    connect(this, &MainWindow::alg_selected, m_captureShowTask,
+            &CaptureShowTask::algChanged);
     connect(this, &MainWindow::switchCapture, m_captureTask,
             &CaptureTask::getCaptureStatus);
     connect(this, &MainWindow::switchCapture, m_captureShowTask,
@@ -89,12 +92,23 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::Ui_Init(Ui::MainWindow *_ui) {
+
     _ui->VideoShow->setMinimumSize(480, 400);
     _ui->VideoShow->setMaximumSize(800, 600);
     QImage image(480, 400, QImage::Format_RGB888);
     image.fill(QColor(Qt::black));
     _ui->VideoShow->setPixmap(QPixmap::fromImage(image));
-    _ui->chartView->setMinimumSize(480, 400);
+    _ui->chartView->setMinimumSize(480, 400);;
+    for(auto& name : ImageProcess::GetInstance().ImageProcessList)
+    {
+        auto action = new QAction(ui->menuSelect);
+        action->setText(tr(name.toUtf8()));
+        ui->menuSelect->addAction(action);
+        connect(action, QOverload<bool>::of(&::QAction::triggered), m_captureShowTask, [action, this](bool){
+            emit alg_selected(action->text());
+            on_pushButtonClose_clicked();
+        });
+    }
 }
 
 MainWindow::~MainWindow() {
@@ -159,7 +173,6 @@ void MainWindow::on_actionImportVideos_triggered() {
     m_videoFileFlag = true;
 }
 
-void MainWindow::on_pushButtonCreateChart_clicked() {}
 
 std::vector<int> MainWindow::RefreshCameraNum() {
     auto *tmp_capture = new cv::VideoCapture;
@@ -194,4 +207,10 @@ void MainWindow::RefreshCaptureSelect() {
                     emit thisCapture(m_selectedCapture);
                 });
     }
+}
+
+void MainWindow::on_actionSetting_triggered(){
+    on_pushButtonClose_clicked();
+    m_settingDialog->show();
+    m_settingDialog->setModal(true);
 }

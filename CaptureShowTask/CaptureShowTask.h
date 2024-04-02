@@ -19,9 +19,11 @@ class CaptureShowTask : public QObject {
    public slots:
     void getCaptureStatus(bool);
     void GetFpsNumber(int fps) { m_fps = fps; };
+    void algChanged(QString);
    signals:
     void EmitDoubleArg(double);
     void SingletonMatError();
+    void changeAxesWithAlg(int);
    private:
     bool m_videoShowFlag{};
     int m_fps{};

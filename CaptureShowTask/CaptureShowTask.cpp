@@ -36,6 +36,18 @@ CaptureShowTask::~CaptureShowTask() {
     qDebug() << "CaptureShowTask Destroyed ID:" << QThread::currentThreadId();
 }
 
+void CaptureShowTask::algChanged(QString str)
+{
+    for(auto &name : ImageProcess::GetInstance().ImageProcessList){
+        if(name == str) // "灰度计算", "光流法", "无目标定位"
+        {
+            int index = ImageProcess::GetInstance().ImageProcessList.indexOf(name);
+            ImageProcess::GetInstance().setfunction(index);
+            emit changeAxesWithAlg(index);
+        }
+    }
+}
+
 void CaptureShowTask::getCaptureStatus(bool boolean) {
     m_videoShowFlag = boolean;
     if (m_timer == nullptr) {

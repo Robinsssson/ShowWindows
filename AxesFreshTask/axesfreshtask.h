@@ -26,7 +26,7 @@ class AxesFreshTask : public QObject {
 
    public slots:
     void axesFreshByDouble(double);
-
+    void changeAxesWithAlgSlot(int);
    private:
     QChartView *qChartView;
     QLineSeries *qLineSeries;
@@ -35,7 +35,7 @@ class AxesFreshTask : public QObject {
     QValueAxis *yLeftAxis;
     QList<QPointF> *qList;
     QFile *csv_file;
-
+    int times = 0;
 };
 
 #endif  // AXESFRESHTASK_H

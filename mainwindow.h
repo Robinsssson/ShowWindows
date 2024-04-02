@@ -8,6 +8,7 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QtCharts>
 
+#include "settingconfig.h"
 #include "AxesFreshTask/axesfreshtask.h"
 #include "CaptureShowTask/CaptureShowTask.h"
 #include "CaptureTask/CaptureTask.h"
@@ -39,12 +40,11 @@ class MainWindow : public QMainWindow {
 
     void on_pushButtonClose_clicked();
 
-    void on_pushButtonCreateChart_clicked();
-
     void on_actionImportVideos_triggered();
 
     void on_actionFPS_triggered();
 
+    void on_actionSetting_triggered();
    signals:
 
     void thisCapture(int number);
@@ -54,6 +54,8 @@ class MainWindow : public QMainWindow {
     void SendVideoFileName(QString);
 
     void SendFpsNumber(int);
+
+    void alg_selected(QString);
 
    public:
     Ui::MainWindow *ui;
@@ -74,5 +76,6 @@ class MainWindow : public QMainWindow {
     AxesFreshTask *axesFreshTask;
     CaptureShowTask *m_captureShowTask;
     CaptureTask *m_captureTask;
+    SettingConfig *m_settingDialog;
 };
 #endif  // MAINWINDOW_H

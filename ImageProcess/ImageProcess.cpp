@@ -77,8 +77,55 @@ double ImageProcess::MatTranslate(cv::Mat &mat) {
     return rect.x + rect.width * 0.5;
 }
 
-double ImageProcess::calGrayPercent(const cv::Mat &mat) {
+double ImageProcess::calGrayPercent(cv::Mat &mat) {
     cv::Mat out_mat;
     cv::cvtColor(mat, out_mat, cv::COLOR_BGR2GRAY);
     return cv::mean(out_mat)[0];
+}
+
+QVector<double> ImageProcess::LKOptricalFlow(cv::Mat &frame, cv::Mat &old_gray, std::vector<cv::Point2f>& p0) {
+    cv::Mat new_gray;
+    cvtColor(frame, new_gray, cv::COLOR_BGR2GRAY);
+    std::vector<cv::Point2f> p1, good_new, good_old;
+    std::vector<uchar> status;
+    std::vector<float> err;
+    cv::calcOpticalFlowPyrLK(old_gray, new_gray, p0, p1, status, err);
+
+    for (int i = 0; i < status.size(); i++) {
+        if (status[i] == 1) {
+            good_new.push_back(p1[i]);
+            good_old.push_back(p0[i]);
+        }
+    }
+
+    cv::Point max_new(good_new[0].x, good_new[0].y), min_new(good_new[0].x, good_new[0].y);
+    for (cv::Point2f point : good_new) {
+        max_new.x = std::max(max_new.x, (int)point.x);
+        max_new.y = std::max(max_new.y, (int)point.y);
+        min_new.x = std::min(min_new.x, (int)point.x);
+        min_new.y = std::min(min_new.y, (int)point.y);
+    }
+    // tag.
+    std::vector<std::vector<float>> sum(LKOptricalFlow_times);
+    for (int iter = 0; iter < good_old.size(); iter++) {
+        cv::Point2f old = good_old[iter], news = good_new[iter];
+        for(int i = 0; i < LKOptricalFlow_times; i ++){
+            if (((int)news.y - min_new.y) < ((max_new.y - min_new.y) / LKOptricalFlow_times) * (i + 1)) {
+                if(((int)news.y - min_new.y) > ((max_new.y - min_new.y) / LKOptricalFlow_times) * (i)){
+                    sum[i].push_back(news.x);
+                    cv::line(LKOptricalFlow_mask, news, old, LKOptricalFlow_color[i], 2);
+                    cv::circle(frame, news, 5, LKOptricalFlow_color[i], -1);
+                }
+            }
+        }
+    }
+
+    QVector<double> mean;
+    for(auto &sum_i : sum)
+        mean.push_back(std::accumulate(sum_i.begin(), sum_i.end(), 0.0) / (double)sum_i.size());
+    LKOptricalFlow_frame_points.push_back(mean);
+    cv::add(LKOptricalFlow_mask, frame, frame);
+    old_gray = new_gray.clone();
+    p0 = good_new;
+    return mean;
 }
