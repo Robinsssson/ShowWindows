@@ -36,13 +36,14 @@ CaptureShowTask::~CaptureShowTask() {
     qDebug() << "CaptureShowTask Destroyed ID:" << QThread::currentThreadId();
 }
 
-void CaptureShowTask::algChanged(QString str)
-{
-    for(auto &name : ImageProcess::GetInstance().ImageProcessList){
-        if(name == str) // "灰度计算", "光流法", "无目标定位"
+void CaptureShowTask::algChanged(QString str) {
+    for (auto &name : ImageProcess::GetInstance().ImageProcessList) {
+        if (name == str)  // "灰度计算", "光流法", "无目标定位"
         {
-            int index = ImageProcess::GetInstance().ImageProcessList.indexOf(name);
+            int index =
+                ImageProcess::GetInstance().ImageProcessList.indexOf(name);
             ImageProcess::GetInstance().setfunction(index);
+            SingletonMatQueue::GetInstance()->ClearAllQueue();
             emit changeAxesWithAlg(index);
         }
     }
@@ -69,7 +70,8 @@ void CaptureShowTask::CaptureShow() {
     qDebug() << "CaptureShowTask ID:" << QThread::currentThreadId();
     auto q_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
     cv::Mat mat = q_mat.mat;
-    emit EmitDoubleArg(q_mat.arg);
+    // emit EmitDoubleArg(q_mat.arg);
+    emit EmitDoubleArgAndTime(q_mat.arg, q_mat.time);
     auto qImage = ImageProcess::GetInstance().cvMatToQImage(mat);
     if (qImage.height() > m_label->maximumHeight() ||
         qImage.width() > m_label->maximumWidth())

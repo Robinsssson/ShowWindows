@@ -62,6 +62,13 @@
           <item>
            <widget class="QChartView" name="fftView"/>
           </item>
+          <item>
+           <widget class="QPushButton" name="pushButtonFFT">
+            <property name="text">
+             <string>频域图</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>

@@ -83,22 +83,27 @@ double ImageProcess::calGrayPercent(cv::Mat &mat) {
     return cv::mean(out_mat)[0];
 }
 
-QVector<double> ImageProcess::LKOptricalFlow(cv::Mat &frame, cv::Mat &old_gray, std::vector<cv::Point2f>& p0) {
+QVector<double> ImageProcess::LKOptricalFlow(cv::Mat &frame, cv::Mat &old_gray,
+                                             std::vector<cv::Point2f> &p0) {
     cv::Mat new_gray;
     cvtColor(frame, new_gray, cv::COLOR_BGR2GRAY);
     std::vector<cv::Point2f> p1, good_new, good_old;
     std::vector<uchar> status;
     std::vector<float> err;
     cv::calcOpticalFlowPyrLK(old_gray, new_gray, p0, p1, status, err);
-
+    for (auto &point : p1) qDebug() << point.x << "," << point.y;
     for (int i = 0; i < status.size(); i++) {
         if (status[i] == 1) {
             good_new.push_back(p1[i]);
             good_old.push_back(p0[i]);
         }
     }
-
-    cv::Point max_new(good_new[0].x, good_new[0].y), min_new(good_new[0].x, good_new[0].y);
+    if (good_new.size() == 0) {
+        ImageProcess::LKOptricalFlow_first_entry = false;
+        return QVector<double>(LKOptricalFlow_times, 0);
+    }
+    cv::Point max_new(good_new[0].x, good_new[0].y),
+        min_new(good_new[0].x, good_new[0].y);
     for (cv::Point2f point : good_new) {
         max_new.x = std::max(max_new.x, (int)point.x);
         max_new.y = std::max(max_new.y, (int)point.y);
@@ -109,11 +114,14 @@ QVector<double> ImageProcess::LKOptricalFlow(cv::Mat &frame, cv::Mat &old_gray, 
     std::vector<std::vector<float>> sum(LKOptricalFlow_times);
     for (int iter = 0; iter < good_old.size(); iter++) {
         cv::Point2f old = good_old[iter], news = good_new[iter];
-        for(int i = 0; i < LKOptricalFlow_times; i ++){
-            if (((int)news.y - min_new.y) < ((max_new.y - min_new.y) / LKOptricalFlow_times) * (i + 1)) {
-                if(((int)news.y - min_new.y) > ((max_new.y - min_new.y) / LKOptricalFlow_times) * (i)){
+        for (int i = 0; i < LKOptricalFlow_times; i++) {
+            if (((int)news.y - min_new.y) <
+                ((max_new.y - min_new.y) / LKOptricalFlow_times) * (i + 1)) {
+                if (((int)news.y - min_new.y) >
+                    ((max_new.y - min_new.y) / LKOptricalFlow_times) * (i)) {
                     sum[i].push_back(news.x);
-                    cv::line(LKOptricalFlow_mask, news, old, LKOptricalFlow_color[i], 2);
+                    cv::line(LKOptricalFlow_mask, news, old,
+                             LKOptricalFlow_color[i], 2);
                     cv::circle(frame, news, 5, LKOptricalFlow_color[i], -1);
                 }
             }
@@ -121,8 +129,9 @@ QVector<double> ImageProcess::LKOptricalFlow(cv::Mat &frame, cv::Mat &old_gray, 
     }
 
     QVector<double> mean;
-    for(auto &sum_i : sum)
-        mean.push_back(std::accumulate(sum_i.begin(), sum_i.end(), 0.0) / (double)sum_i.size());
+    for (auto &sum_i : sum)
+        mean.push_back(std::accumulate(sum_i.begin(), sum_i.end(), 0.0) /
+                       (double)sum_i.size());
     LKOptricalFlow_frame_points.push_back(mean);
     cv::add(LKOptricalFlow_mask, frame, frame);
     old_gray = new_gray.clone();

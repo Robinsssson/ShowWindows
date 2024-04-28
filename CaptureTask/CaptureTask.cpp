@@ -12,7 +12,7 @@
 #include "../ImageProcess/ImageProcess.h"
 #include "../MatQueue/SingletonMatQueue.h"
 
-/*2023/11/23 Bug log
+/*   2023/11/23 Bug log
  *   打开视频然后退出软件之后，CaptureTask退出异常
  *   bug fixed... but haven't do anything..
  * */
@@ -31,21 +31,23 @@ CaptureTask::~CaptureTask() {
     delete m_mat;
 }
 
-//Bug in there.
+// Bug in there.
 void CaptureTask::PushMat() {
     qDebug() << "CaptureTask ID:" << QThread::currentThreadId();
     if (!m_capture->read(*m_mat)) {
-        if(m_captureSelect == -1)
-            emit VideoOver();
+        if (m_captureSelect == -1) emit VideoOver();
         getCaptureStatus(false);
     } else {
         SingletonMatQueue::GetInstance()->enqueueNotProcessed(
             *m_mat, QTime::currentTime());
         if (SingletonMatQueue::GetInstance()->checkNotProcessed() > 0) {
             // QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-            Q_Mat q_mat = SingletonMatQueue::GetInstance()->dequeueNotProcessed();
-            double num = ImageProcess::GetInstance().process_function(q_mat.mat);
-            SingletonMatQueue::GetInstance()->enqueueProcessedWithArg(q_mat.mat, q_mat.time, num);
+            Q_Mat q_mat =
+                SingletonMatQueue::GetInstance()->dequeueNotProcessed();
+            double num =
+                ImageProcess::GetInstance().process_function(q_mat.mat);
+            SingletonMatQueue::GetInstance()->enqueueProcessedWithArg(
+                q_mat.mat, q_mat.time, num);
         }
     }
 }

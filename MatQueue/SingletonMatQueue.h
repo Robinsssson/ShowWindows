@@ -30,8 +30,7 @@ class SingletonMatQueue : public QObject {
     Q_OBJECT
 
    public:
-    SingletonMatQueue() {
-    }
+    SingletonMatQueue() {}
 
     ~SingletonMatQueue() override = default;
 
@@ -43,8 +42,7 @@ class SingletonMatQueue : public QObject {
     static SingletonMatQueue *GetInstance() {
         if (m_instance == NULL) {
             QMutexLocker mutexLocker(&m_mutex);
-            if (m_instance == NULL)
-                m_instance = new SingletonMatQueue();
+            if (m_instance == NULL) m_instance = new SingletonMatQueue();
         }
         return m_instance;
     }
@@ -76,14 +74,14 @@ class SingletonMatQueue : public QObject {
 
     Q_Mat dequeueProcessed() {
         QMutexLocker mutexLocker(&m_mutex);
-        if (m_matQueueProcessed.isEmpty())
-            return m_matQueueProcessed.head();
+        if (m_matQueueProcessed.isEmpty()) return m_matQueueProcessed.head();
         return m_matQueueProcessed.dequeue();
     }
 
     long long checkNotProcessed() {
         QMutexLocker mutexLocker(&m_mutex);
-        return m_matQueueNotProcessed.size(); }
+        return m_matQueueNotProcessed.size();
+    }
 
     long long checkProcessed() {
         QMutexLocker mutexLocker(&m_mutex);
@@ -98,7 +96,7 @@ class SingletonMatQueue : public QObject {
 
    private:
     static QMutex m_mutex;
-    static SingletonMatQueue* m_instance;
+    static SingletonMatQueue *m_instance;
     QQueue<Q_Mat> m_matQueueNotProcessed;
     QQueue<Q_Mat> m_matQueueProcessed;  // 改成优先队列
 };

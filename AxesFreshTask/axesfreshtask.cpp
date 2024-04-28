@@ -1,6 +1,8 @@
 #include "axesfreshtask.h"
+
 #include <QThread>
 #include <QTime>
+
 #include "../ImageProcess/ImageProcess.h"
 /***************************************************************
  *  2023/12/28
@@ -19,7 +21,9 @@ AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
     qList = new QList<QPointF>;
     xBottomAxis->setRange(0, 100);
     yLeftAxis->setRange(0, 1000);
-    auto alg_name = ImageProcess::GetInstance().ImageProcessList[ImageProcess::GetInstance().getfunction()];
+    auto alg_name =
+        ImageProcess::GetInstance()
+            .ImageProcessList[ImageProcess::GetInstance().getfunction()];
     csv_file = new QFile(alg_name + ".csv");
     setqChartView(qChartView);
     qChart->addSeries(qLineSeries);
@@ -33,38 +37,43 @@ AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
     qChartView->setRenderHint(QPainter::Antialiasing);
     qChartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    if(csv_file->open(QIODevice::WriteOnly)){
+    if (csv_file->open(QIODevice::WriteOnly)) {
         QString str;
-        QTextStream(&str) << "times" << "," << "arg" << Qt::endl;
+        QTextStream(&str) << "times"
+                          << ","
+                          << "arg" << Qt::endl;
         csv_file->write(str.toUtf8());
     }
     csv_file->close();
 }
-// not use
-// void AxesFreshTask::axesFreshByMat(cv::Mat mat) {
-//     qDebug() << "axesFresh ID:" << QThread::currentThreadId();
-//     static int times = 0;
-//     if (qList->size() > 100) {
-//         qList->pop_front();
-//         int n = std::ceil(qList->first().x());
-//         xBottomAxis->setRange(n, 100 + n);
-//     }
-//     qList->append(QPointF(times++, m_function(mat)));
-//     qLineSeries->clear();
-//     qLineSeries->append(*qList);
-// }
 
 void AxesFreshTask::axesFreshByDouble(double arg) {
-
     if (qList->size() > 100) {
         qList->pop_front();
-        int n = std::ceil(qList->first().x()); // ?
+        int n = std::ceil(qList->first().x());  // ?
         xBottomAxis->setRange(n, 100 + n);
     }
     qList->append(QPointF(times++, arg));
     qLineSeries->clear();
     qLineSeries->append(*qList);
-    if(csv_file->open(QIODevice::Append)){
+    if (csv_file->open(QIODevice::Append)) {
+        QString str;
+        QTextStream(&str) << times << "," << arg << Qt::endl;
+        csv_file->write(str.toUtf8());
+    }
+    csv_file->close();
+}
+
+void AxesFreshTask::axesFreshByDoubleAndTime(double arg, QTime time) {
+    if (qList->size() > 100) {
+        qList->pop_front();
+        int n = std::ceil(qList->first().x());  // ?
+        xBottomAxis->setRange(n, 100 + n);
+    }
+    qList->append(QPointF(times++, arg));
+    qLineSeries->clear();
+    qLineSeries->append(*qList);
+    if (csv_file->open(QIODevice::Append)) {
         QString str;
         QTextStream(&str) << times << "," << arg << Qt::endl;
         csv_file->write(str.toUtf8());
@@ -87,12 +96,14 @@ void AxesFreshTask::changeAxesWithAlgSlot(int index) {
     qChart->setTitle(tr(alg_name.toUtf8()));
     qList->clear();
     qLineSeries->clear();
-
+    xBottomAxis->setRange(0, 100);
     delete csv_file;
     csv_file = new QFile(alg_name + ".csv");
-    if(csv_file->open(QIODevice::WriteOnly)){
+    if (csv_file->open(QIODevice::WriteOnly)) {
         QString str;
-        QTextStream(&str) << "times" << "," << "arg" << Qt::endl;
+        QTextStream(&str) << "times"
+                          << ","
+                          << "arg" << Qt::endl;
         csv_file->write(str.toUtf8());
     }
     times = 0;

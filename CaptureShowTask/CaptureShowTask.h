@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QTimer>
 #include <QtCore/QThread>
+#include <QTime>
 #include <opencv2/opencv.hpp>
 
 class CaptureShowTask : public QObject {
@@ -22,8 +23,10 @@ class CaptureShowTask : public QObject {
     void algChanged(QString);
    signals:
     void EmitDoubleArg(double);
+    void EmitDoubleArgAndTime(double, QTime);
     void SingletonMatError();
     void changeAxesWithAlg(int);
+
    private:
     bool m_videoShowFlag{};
     int m_fps{};

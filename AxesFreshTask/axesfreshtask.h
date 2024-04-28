@@ -2,6 +2,7 @@
 #define AXESFRESHTASK_H
 #include <QChart>
 #include <QChartView>
+#include <QFile>
 #include <QFunctionPointer>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -10,8 +11,8 @@
 #include <QObject>
 #include <QPointF>
 #include <QValueAxis>
-#include <QFile>
 #include <opencv2/opencv.hpp>
+#include <QTime>
 
 class AxesFreshTask : public QObject {
     Q_OBJECT
@@ -27,6 +28,8 @@ class AxesFreshTask : public QObject {
    public slots:
     void axesFreshByDouble(double);
     void changeAxesWithAlgSlot(int);
+    void axesFreshByDoubleAndTime(double arg, QTime time);
+
    private:
     QChartView *qChartView;
     QLineSeries *qLineSeries;

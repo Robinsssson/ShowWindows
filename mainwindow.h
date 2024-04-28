@@ -8,10 +8,10 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QtCharts>
 
-#include "settingconfig.h"
 #include "AxesFreshTask/axesfreshtask.h"
 #include "CaptureShowTask/CaptureShowTask.h"
 #include "CaptureTask/CaptureTask.h"
+#include "settingconfig.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
