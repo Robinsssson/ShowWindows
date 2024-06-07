@@ -1,50 +1,109 @@
 #include "axesfreshtask.h"
 
+#include <QJsonArray>
 #include <QThread>
 #include <QTime>
 
 #include "../ImageProcess/ImageProcess.h"
-/***************************************************************
+#include "../Project_Config.h"
+/******************************************************************
  *  2023/12/28
  *  brief：添加了本类用作更新chart对象
  *  --bug wait fixed: chart无法做到即时更新，从而实现队列的跟进效果。
  *  bug fixed: using replot and clear to do that
  *  wait add feature: 添加方法让横坐标轴改为QTime
- ***************************************************************/
-AxesFreshTask::AxesFreshTask(QChartView *qChartView, QObject *parent)
-    : QObject{parent} {
+ ******************************************************************/
+AxesFreshTask::AxesFreshTask(QChartView *qChartView, QJsonObject json, QObject *parent) : QObject{parent} {
     qDebug() << "AxesFreshTask Constructored ID:" << QThread::currentThreadId();
     qChart = new QChart;
     qLineSeries = new QLineSeries;
     xBottomAxis = new QValueAxis;
     yLeftAxis = new QValueAxis;
     qList = new QList<QPointF>;
-    xBottomAxis->setRange(0, 100);
-    yLeftAxis->setRange(0, 1000);
-    auto alg_name =
-        ImageProcess::GetInstance()
-            .ImageProcessList[ImageProcess::GetInstance().getfunction()];
+
+    auto alg_name = ImageProcess::GetInstance().getName();
     csv_file = new QFile(alg_name + ".csv");
+    ansysAttribute(this, json);
+
     setqChartView(qChartView);
+
     qChart->addSeries(qLineSeries);
     qChart->addAxis(yLeftAxis, Qt::AlignLeft);
     qChart->addAxis(xBottomAxis, Qt::AlignBottom);
+    qChart->legend()->hide();
+
     qLineSeries->attachAxis(xBottomAxis);
     qLineSeries->attachAxis(yLeftAxis);
-    qChart->legend()->hide();
-    qChart->setTitle(tr(alg_name.toUtf8()));
+
     qChartView->setChart(qChart);
     qChartView->setRenderHint(QPainter::Antialiasing);
     qChartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    qChartView->setFixedSize(AXES_W, AXES_H);
 
     if (csv_file->open(QIODevice::WriteOnly)) {
         QString str;
-        QTextStream(&str) << "times"
-                          << ","
-                          << "arg" << Qt::endl;
+        QTextStream(&str) << "times,arg" << Qt::endl;
         csv_file->write(str.toUtf8());
     }
     csv_file->close();
+}
+void AxesFreshTask::LazyInit(QChartView *qChartView, QJsonObject json) {
+    qDebug() << "AxesFreshTask Constructored ID:" << QThread::currentThreadId();
+    qChart = new QChart;
+    qLineSeries = new QLineSeries;
+    xBottomAxis = new QValueAxis;
+    yLeftAxis = new QValueAxis;
+    qList = new QList<QPointF>;
+
+    auto alg_name = json["file"].toString();
+    qDebug() << "name : " << alg_name;
+    csv_file = new QFile(alg_name + ".csv");
+    ansysAttribute(this, json);
+
+    setqChartView(qChartView);
+
+    qChart->addSeries(qLineSeries);
+    qChart->addAxis(yLeftAxis, Qt::AlignLeft);
+    qChart->addAxis(xBottomAxis, Qt::AlignBottom);
+    qChart->legend()->hide();
+
+    qLineSeries->attachAxis(xBottomAxis);
+    qLineSeries->attachAxis(yLeftAxis);
+
+    qChartView->setChart(qChart);
+    qChartView->setRenderHint(QPainter::Antialiasing);
+    qChartView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    qChartView->setFixedSize(AXES_W, AXES_H);
+
+    if (csv_file->open(QIODevice::WriteOnly)) {
+        QString str;
+        QTextStream(&str) << "times,arg" << Qt::endl;
+        csv_file->write(str.toUtf8());
+    }
+    csv_file->close();
+}
+void AxesFreshTask::ansysAttribute(AxesFreshTask *obj, QJsonObject json) {
+    QMap<QString, std::function<void(QString)>> map;
+    map.insert("x_label", [&](QString attr) {
+        auto tmp = json[attr];
+        this->xBottomAxis->setTitleText(tmp.toString());
+    });
+    map.insert("y_label", [&](QString attr) {
+        auto tmp = json[attr];
+        this->yLeftAxis->setTitleText(tmp.toString());
+    });
+    map.insert("y_lim", [&](QString attr) {
+        auto tmp = json[attr];
+        auto arr = tmp.toArray();
+        this->yLeftAxis->setRange(arr[0].toDouble(), arr[1].toDouble());
+    });
+    map.insert("title", [&](QString attr) {
+        auto tmp = json[attr];
+        this->qChart->setTitle(tmp.toString());
+    });
+    map.insert("file", [&](QString attr) {
+    });
+    for (const auto &attr : json.keys()) map[attr](attr);
 }
 
 void AxesFreshTask::axesFreshByDouble(double arg) {

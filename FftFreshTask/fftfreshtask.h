@@ -8,10 +8,10 @@
 
 class FftFreshTask : public QObject {
     Q_OBJECT
-   public:
+  public:
     FftFreshTask(QChartView *qGraphicsView);
 
-   private:
+  private:
     QChartView *m_qChartView;
     io::CSVReader<2> *reader;
 };

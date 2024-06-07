@@ -1,5 +1,10 @@
 #include "mainwindow.h"
 
+#include <fftw3.h>
+
+#include <QTime>
+#include <QVector>
+
 #include "./ui_mainwindow.h"
 #include "ImageProcess/ImageProcess.h"
 #include "MatQueue/SingletonMatQueue.h"
@@ -34,84 +39,89 @@
  *          2.2 待定....
  * */
 
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow) {
+#define MESSAGESHOW(str) ui->textBrowser->append('[' + QTime::currentTime().toString() + "] >>" + (str));
+
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     // int Initialization
     qDebug() << "MainThread" << QThread::currentThreadId();
-    m_captureNumber = RefreshCameraNum();
+    qDebug() << fftw_version;
+    m_captureNumber = RefreshCameraNum(&m_init_size);
     RefreshCaptureSelect();
-
     // object Initialization
-    threadAxesFreshTask = new QThread;
     threadVideoShowTask = new QThread;
-    threadFftFreshTask = new QThread;
     threadVideoTask = new QThread;
-    axesFreshTask = new AxesFreshTask(ui->chartView);
+    // axesFreshTask = new AxesFreshTask(ui->chartView);
     m_captureTask = new CaptureTask;
     m_captureShowTask = new CaptureShowTask(ui->VideoShow);
     m_captureShowTask->moveToThread(threadVideoShowTask);
     m_captureTask->moveToThread(threadVideoTask);
-    axesFreshTask->moveToThread(threadAxesFreshTask);
-    Ui_Init(ui);
-    ui->textBrowser->append(tr("测试\n"));
+    Ui_Init(m_init_size);
+    MESSAGESHOW(tr("测试"));
     m_settingDialog = new SettingConfig(this);
     SingletonMatQueue::GetInstance();
-
+    auto file = QFile(CONFIG_PATH + "setting.json");
+    m_wait_send_rect = new cv::Rect();
+    try {
+        ansys_setting = new AnsysSetting(file);
+        ansys_setting->ansys(ui->tools_widget);
+    } catch (...) {
+        qDebug() << "error";
+        exit(-1);
+    }
     // connect
-    connect(m_captureShowTask, &CaptureShowTask::changeAxesWithAlg,
-            axesFreshTask, &AxesFreshTask::changeAxesWithAlgSlot,
-            Qt::QueuedConnection);
-    connect(this, QOverload<int>::of(&MainWindow::thisCapture), m_captureTask,
-            &CaptureTask::getCaptureNumber);
-    connect(this, &MainWindow::alg_selected, m_captureShowTask,
-            &CaptureShowTask::algChanged);
-    connect(this, &MainWindow::switchCapture, m_captureTask,
-            &CaptureTask::getCaptureStatus);
-    connect(this, &MainWindow::switchCapture, m_captureShowTask,
-            &CaptureShowTask::getCaptureStatus, Qt::QueuedConnection);
-    connect(this, QOverload<QString>::of(&MainWindow::SendVideoFileName),
-            m_captureTask, &CaptureTask::SetVideo);
-    connect(this, &MainWindow::SendFpsNumber, m_captureShowTask,
-            &CaptureShowTask::GetFpsNumber, Qt::QueuedConnection);
-    connect(this, &MainWindow::SendFpsNumber, m_captureTask,
-            &CaptureTask::GetFpsNumber, Qt::QueuedConnection);
-    // connect(m_captureShowTask, &CaptureShowTask::EmitDoubleArg, axesFreshTask,
+    connect(this, QOverload<int>::of(&MainWindow::thisCapture), m_captureTask, &CaptureTask::getCaptureNumber);
+    connect(this, &MainWindow::alg_selected, m_captureShowTask, &CaptureShowTask::algChanged);
+    connect(this, &MainWindow::switchCapture, m_captureTask, &CaptureTask::getCaptureStatus);
+    connect(this, &MainWindow::switchCapture, m_captureShowTask, &CaptureShowTask::getCaptureStatus, Qt::QueuedConnection);
+    connect(this, QOverload<QString>::of(&MainWindow::SendVideoFileName), m_captureTask, &CaptureTask::SetVideo);
+    connect(this, &MainWindow::SendFpsNumber, m_captureShowTask, &CaptureShowTask::GetFpsNumber, Qt::QueuedConnection);
+    connect(this, &MainWindow::SendFpsNumber, m_captureTask, &CaptureTask::GetFpsNumber, Qt::QueuedConnection);
+    connect(m_captureTask, &CaptureTask::videoFPS, m_captureShowTask, &CaptureShowTask::getVideoFPS);
+    // connect(m_captureShowTask, &CaptureShowTask::EmitDoubleArg,
+    // axesFreshTask,
     //         &AxesFreshTask::axesFreshByDouble, Qt::QueuedConnection);
-    connect(m_captureShowTask, &CaptureShowTask::EmitDoubleArgAndTime, axesFreshTask,
-            &AxesFreshTask::axesFreshByDoubleAndTime, Qt::QueuedConnection);
-    connect(m_captureTask, &CaptureTask::VideoOver, this,
-            [this]() { on_pushButtonClose_clicked(); });
-    connect(m_captureShowTask, &CaptureShowTask::SingletonMatError, this,
-            [this]() {
-                QMessageBox::warning(this, tr("singleton mat crushed"),
-                                     tr("restart the application"));
-                SingletonMatQueue::GetInstance()->ClearAllQueue();
-            });
-
+    connect(this, &MainWindow::send_rect, m_captureShowTask, &CaptureShowTask::showTaskGetRect);
+    connect(this, &MainWindow::send_rect, m_captureTask, &CaptureTask::taskGetRect);
+    connect(m_captureTask, &CaptureTask::VideoOver, this, [this]() { on_pushButtonClose_clicked(); });
+    connect(m_captureShowTask, &CaptureShowTask::SingletonMatError, this, [this]() {
+        QMessageBox::warning(this, tr("singleton mat crushed"), tr("restart the application"));
+        SingletonMatQueue::GetInstance()->ClearAllQueue();
+    });
+    // connect(ansys_setting->m_button, &QPushButton::clicked, this, [this]() { set_video_show(this->m_init_size, true); });
     threadVideoTask->start(QThread::HighestPriority);
-    threadAxesFreshTask->start(QThread::LowPriority);
     threadVideoShowTask->start(QThread::HighPriority);
 }
 
-void MainWindow::Ui_Init(Ui::MainWindow *_ui) {
-    _ui->VideoShow->setMinimumSize(480, 400);
-    _ui->VideoShow->setMaximumSize(800, 600);
-    QImage image(480, 400, QImage::Format_RGB888);
-    image.fill(QColor(Qt::black));
-    _ui->VideoShow->setPixmap(QPixmap::fromImage(image));
-    _ui->chartView->setMinimumSize(480, 400);
-    _ui->fftView->setMinimumSize(480, 100);
+void MainWindow::Ui_Init(QSize size) {
+    set_video_show(size);
     for (auto &name : ImageProcess::GetInstance().ImageProcessList) {
         auto action = new QAction(ui->menuSelect);
         action->setText(tr(name.toUtf8()));
         ui->menuSelect->addAction(action);
-        connect(action, QOverload<bool>::of(&::QAction::triggered),
-                m_captureShowTask, [action, this](bool) {
-                    emit alg_selected(action->text());
-                    on_pushButtonClose_clicked();
-                });
+        connect(action, QOverload<bool>::of(&::QAction::triggered), m_captureShowTask, [action, this](bool) {
+            emit alg_selected(action->text());
+            on_pushButtonClose_clicked();
+        });
     }
+}
+
+void MainWindow::set_video_show(QSize size, bool is_signal) {
+    QImage image;
+    cv::Mat mat = cv::Mat::zeros(cv::Size(size.width(), size.height()), CV_8UC1);
+    if (!is_signal) {
+        image = ImageProcess::GetInstance().cvMatToQImage(mat);
+    } else {
+        QVector<QString> strs{"x", "y", "width", "height"};
+        auto args = this->ansys_setting->get_config(strs);
+        qDebug() << args;
+        *m_wait_send_rect = cv::Rect(args[0], args[1], args[2], args[3]);
+        cv::rectangle(mat, *m_wait_send_rect, cv::Scalar(255, 255, 255));
+        image = ImageProcess::GetInstance().cvMatToQImage(mat);
+        emit send_rect(m_wait_send_rect);
+    }
+    this->ui->VideoShow->setPixmap(QPixmap::fromImage(image));
+    this->ui->VideoShow->setFixedSize(size);
 }
 
 MainWindow::~MainWindow() {
@@ -123,21 +133,20 @@ MainWindow::~MainWindow() {
     threadVideoTask->wait();
     threadVideoTask->deleteLater();
 
-    threadAxesFreshTask->quit();
-    threadAxesFreshTask->wait();
-    threadAxesFreshTask->deleteLater();
-
-    delete axesFreshTask;
+    delete ansys_setting;
     delete m_captureShowTask;
     delete m_captureTask;
+
+    delete m_wait_send_rect;
     delete ui;
 }
 
 void MainWindow::on_pushButtonOpen_clicked() {
     if (m_captureOpenFlag) return;
     m_captureOpenFlag = true;
+    SingletonMatQueue::GetInstance()->ClearAllQueue();
     emit switchCapture(m_captureOpenFlag);
-    ui->textBrowser->append(tr("摄像头开启\n"));
+    MESSAGESHOW(tr("摄像头开启"));
 }
 
 void MainWindow::on_pushButtonClose_clicked() {
@@ -145,47 +154,60 @@ void MainWindow::on_pushButtonClose_clicked() {
     m_captureOpenFlag = false;
     emit switchCapture(m_captureOpenFlag);
     m_videoFileFlag = false;
-    QImage image(480, 400, QImage::Format_RGB888);
-    image.fill(QColor(Qt::black));
-    ui->VideoShow->setFixedSize(480, 400);
-    ui->VideoShow->setPixmap(QPixmap::fromImage(image));
-    ui->textBrowser->append(tr("摄像头关闭\n"));
+    set_video_show(m_init_size);
+    MESSAGESHOW(tr("摄像头关闭"));
 }
 
 void MainWindow::on_actionFPS_triggered() {
     bool checkConfig = false;
-    m_fpsConfig = QInputDialog::getInt(this, tr("输入FPS"), tr("输入Int"),
-                                       m_fpsConfig, 1, 1000, 1, &checkConfig);
-    if (!checkConfig)
-        QMessageBox::warning(this, tr("非法输入"), tr("输入值无效！"));
-    ui->textBrowser->append("FPS:" + QString::number(m_fpsConfig) + '\n');
+    m_fpsConfig = QInputDialog::getInt(this, tr("输入FPS"), tr("输入Int"), m_fpsConfig, 1, 1000, 1, &checkConfig);
+    if (!checkConfig) QMessageBox::warning(this, tr("非法输入"), tr("输入值无效！"));
+    MESSAGESHOW("FPS:" + QString::number(m_fpsConfig));
     emit SendFpsNumber(m_fpsConfig);
     on_pushButtonClose_clicked();
 }
 
 void MainWindow::on_actionImportVideos_triggered() {
-    m_videoFileName = QFileDialog::
-        getOpenFileName(  // C:/Projects/VSC_Proj/Python/OpenCV_Project/motion.avi
-            this, tr("打开视频文件"), "C:/",
-            tr("video files(*.avi *mp4);;All files(*.*)"));
+    m_videoFileName = QFileDialog::getOpenFileName(this, tr("打开视频文件"), "C:/", tr("video files(*.avi *mp4);;All files(*.*)"));
     if (m_videoFileName.isEmpty()) {
         QMessageBox::warning(this, "Warning", "Failed to find");
         return;
     }
-    ui->textBrowser->append(m_videoFileName);
+    MESSAGESHOW(m_videoFileName);
+    auto tmp = cv::VideoCapture(m_videoFileName.toStdString());
+    if (tmp.isOpened()) {
+        cv::Mat mat;
+        tmp.read(mat);
+        m_init_size = ImageProcess::GetInstance().cvMatToQImage(mat).size();
+        set_video_show(m_init_size);
+        tmp.release();
+    } else {
+        tmp.release();
+        QMessageBox::warning(this, "Warning", "Failed to Open the video");
+        return;
+    }
     emit SendVideoFileName(m_videoFileName);
     m_videoFileFlag = true;
 }
 
-std::vector<int> MainWindow::RefreshCameraNum() {
+std::vector<int> MainWindow::RefreshCameraNum(QSize *size) {
     auto *tmp_capture = new cv::VideoCapture;
     int _count;
+    bool is_default = true;
     std::vector<int> __v;
     for (_count = 0; _count < MAX_CAPTURE_NUM; _count++) {
         tmp_capture->open(_count);
         if (!tmp_capture->isOpened()) {
             tmp_capture->release();
             continue;
+        }
+        if (is_default) {
+            cv::Mat mat;
+            tmp_capture->read(mat);
+            auto s = ImageProcess::GetInstance().cvMatToQImage(mat).size();
+            size->setHeight(s.height());
+            size->setWidth(s.width());
+            is_default = ~is_default;
         }
         __v.push_back(_count);
         tmp_capture->release();  // 一定要释放 否则程序进程不能完全退出
@@ -196,18 +218,14 @@ std::vector<int> MainWindow::RefreshCameraNum() {
 
 void MainWindow::RefreshCaptureSelect() {
     for (int _index : m_captureNumber) {
-        auto *CAPTURE_ACTION_CREATE(_index) =
-            new QAction(QString::number(_index), ui->menuCaptureSelect);
+        auto *CAPTURE_ACTION_CREATE(_index) = new QAction(QString::number(_index), ui->menuCaptureSelect);
         ui->menuCaptureSelect->addAction(CAPTURE_ACTION_CREATE(_index));
-        connect(CAPTURE_ACTION_CREATE(_index),
-                QOverload<bool>::of(&::QAction::triggered), this, [=](bool) {
-                    MainWindow::m_selectedCapture = _index;
-                    ui->textBrowser->append(tr("摄像头") +
-                                            QString::number(m_selectedCapture) +
-                                            tr("启用\n"));
-                    on_pushButtonClose_clicked();
-                    emit thisCapture(m_selectedCapture);
-                });
+        connect(CAPTURE_ACTION_CREATE(_index), QOverload<bool>::of(&::QAction::triggered), this, [=](bool) {
+            MainWindow::m_selectedCapture = _index;
+            MESSAGESHOW(tr("摄像头") + QString::number(m_selectedCapture) + tr("启用"));
+            on_pushButtonClose_clicked();
+            emit thisCapture(m_selectedCapture);
+        });
     }
 }
 

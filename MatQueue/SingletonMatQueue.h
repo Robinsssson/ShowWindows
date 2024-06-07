@@ -29,7 +29,7 @@ struct Q_Mat {
 class SingletonMatQueue : public QObject {
     Q_OBJECT
 
-   public:
+  public:
     SingletonMatQueue() {}
 
     ~SingletonMatQueue() override = default;
@@ -38,7 +38,7 @@ class SingletonMatQueue : public QObject {
 
     SingletonMatQueue &operator=(const SingletonMatQueue &) = delete;
 
-   public:
+  public:
     static SingletonMatQueue *GetInstance() {
         if (m_instance == NULL) {
             QMutexLocker mutexLocker(&m_mutex);
@@ -57,8 +57,7 @@ class SingletonMatQueue : public QObject {
         m_matQueueProcessed.enqueue(Q_Mat(time, mat));
     }
 
-    void enqueueProcessedWithArg(const cv::Mat &mat, const QTime &time,
-                                 double arg) {
+    void enqueueProcessedWithArg(const cv::Mat &mat, const QTime &time, double arg) {
         QMutexLocker mutexLocker(&m_mutex);
         auto q_mat = Q_Mat(time, mat);
         q_mat.set_arg(arg);
@@ -67,8 +66,7 @@ class SingletonMatQueue : public QObject {
 
     Q_Mat dequeueNotProcessed() {
         QMutexLocker mutexLocker(&m_mutex);
-        if (m_matQueueNotProcessed.isEmpty())
-            return m_matQueueNotProcessed.head();
+        if (m_matQueueNotProcessed.isEmpty()) return m_matQueueNotProcessed.head();
         return m_matQueueNotProcessed.dequeue();
     }
 
@@ -94,7 +92,7 @@ class SingletonMatQueue : public QObject {
         m_matQueueProcessed.clear();
     }
 
-   private:
+  private:
     static QMutex m_mutex;
     static SingletonMatQueue *m_instance;
     QQueue<Q_Mat> m_matQueueNotProcessed;

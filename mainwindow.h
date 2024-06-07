@@ -8,33 +8,34 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QtCharts>
 
-#include "AxesFreshTask/axesfreshtask.h"
 #include "CaptureShowTask/CaptureShowTask.h"
 #include "CaptureTask/CaptureTask.h"
+#include "Utility/AnsysSetting/ansyssetting.h"
 #include "settingconfig.h"
-
 QT_BEGIN_NAMESPACE
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-   public:
+  public:
     explicit MainWindow(QWidget *parent = nullptr);
 
     ~MainWindow() override;
 
-   private:
-    static std::vector<int> RefreshCameraNum();
+    void set_video_show(QSize size, bool is_signal = false);
+
+  private:
+    static std::vector<int> RefreshCameraNum(QSize *size);
 
     void RefreshCaptureSelect();
 
-    void Ui_Init(Ui::MainWindow *_ui);
+    void Ui_Init(QSize size);
 
-   public slots:
+  public slots:
 
     void on_pushButtonOpen_clicked();
 
@@ -45,7 +46,7 @@ class MainWindow : public QMainWindow {
     void on_actionFPS_triggered();
 
     void on_actionSetting_triggered();
-   signals:
+  signals:
 
     void thisCapture(int number);
 
@@ -57,10 +58,11 @@ class MainWindow : public QMainWindow {
 
     void alg_selected(QString);
 
-   public:
-    Ui::MainWindow *ui;
+    void send_rect(cv::Rect *);
 
-   private:
+  public:
+    Ui::MainWindow *ui;
+  private:
     bool m_captureOpenFlag = false;
     bool m_chart_windows_status = false;
     QString m_videoFileName;
@@ -68,14 +70,13 @@ class MainWindow : public QMainWindow {
     int m_fpsConfig = 1;
     std::vector<int> m_captureNumber;
     int m_selectedCapture = 0;
-
-    QThread *threadAxesFreshTask;
-    QThread *threadFftFreshTask;
+    AnsysSetting *ansys_setting;
     QThread *threadVideoShowTask;
     QThread *threadVideoTask;
-    AxesFreshTask *axesFreshTask;
     CaptureShowTask *m_captureShowTask;
     CaptureTask *m_captureTask;
     SettingConfig *m_settingDialog;
+    QSize m_init_size;
+    cv::Rect *m_wait_send_rect = nullptr;
 };
 #endif  // MAINWINDOW_H

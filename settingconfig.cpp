@@ -4,14 +4,14 @@
 
 #include "ImageProcess/ImageProcess.h"
 #include "ui_settingconfig.h"
-SettingConfig::SettingConfig(QWidget *parent)
-    : QDialog(parent), ui(new Ui::SettingConfig) {
+SettingConfig::SettingConfig(QWidget *parent) : QDialog(parent), ui(new Ui::SettingConfig) {
     ui->setupUi(this);
-    ui->EditLKOptricalFlowTimes->setText(
-        QString::number(ImageProcess::GetInstance().LKOptricalFlow_times));
+    ui->EditLKOptricalFlowTimes->setText(QString::number(ImageProcess::GetInstance().LKOptricalFlow_times));
 }
 
-SettingConfig::~SettingConfig() { delete ui; }
+SettingConfig::~SettingConfig() {
+    delete ui;
+}
 void SettingConfig::on_pushButtonFirm_clicked() {
     auto gets = ui->EditLKOptricalFlowTimes->text();
     bool ok;
@@ -23,4 +23,6 @@ void SettingConfig::on_pushButtonFirm_clicked() {
         this->close();
     }
 }
-void SettingConfig::on_pushButtonCancel_clicked() { this->close(); }
+void SettingConfig::on_pushButtonCancel_clicked() {
+    this->close();
+}

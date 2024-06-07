@@ -14,7 +14,6 @@ void ImageProcessTask::run() {
     if (SingletonMatQueue::GetInstance()->checkNotProcessed() > 0) {
         Q_Mat q_mat = SingletonMatQueue::GetInstance()->dequeueNotProcessed();
         double num = ImageProcess::GetInstance().process_function(q_mat.mat);
-        SingletonMatQueue::GetInstance()->enqueueProcessedWithArg(
-            q_mat.mat, q_mat.time, num);
+        SingletonMatQueue::GetInstance()->enqueueProcessedWithArg(q_mat.mat, q_mat.time, num);
     }
 }

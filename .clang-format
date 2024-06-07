@@ -1,3 +1,54 @@
-Language:   Cpp
-BasedOnStyle: Google
-IndentWidth: 4
+---
+Language:        Cpp          # 指定语言为C++
+BasedOnStyle:    Google       # 基于Google的代码风格
+AccessModifierOffset: -2      # 访问修饰符的缩进偏移量设为-2
+AlignAfterOpenBracket: DontAlign  # 不对齐在括号后面开始的内容
+AlignOperands:   false        # 不对齐操作数
+AlignTrailingComments: true   # 对齐尾随注释
+AllowAllParametersOfDeclarationOnNextLine: false  # 不允许所有声明的参数换行
+AllowShortFunctionsOnASingleLine: InlineOnly  # 只允许短函数单行显示
+AllowShortIfStatementsOnASingleLine: true    # 允许短if语句单行显示
+AllowShortLoopsOnASingleLine: true           # 允许短循环单行显示
+AlwaysBreakAfterDefinitionReturnType: None   # 定义返回类型后不强制换行
+AlwaysBreakBeforeMultilineStrings: false     # 多行字符串前不强制换行
+BreakBeforeBinaryOperators: NonAssignment    # 非赋值二元运算符前换行
+BreakBeforeBraces: Attach                    # 在大括号前不换行
+BreakBeforeTernaryOperators: true            # 三元运算符前换行
+ColumnLimit:     200                         # 列宽限制为200字符
+CompactNamespaces: true                      # 使用紧凑命名空间格式
+ConstructorInitializerAllOnOneLineOrOnePerLine: true  # 构造函数初始化列表全部在一行或每行一个
+ConstructorInitializerIndentWidth: 4         # 构造函数初始化列表缩进宽度
+ContinuationIndentWidth: 4                   # 续行缩进宽度
+IndentCaseLabels: true                       # 缩进case标签
+IndentWidth:     4                           # 缩进宽度
+KeepEmptyLinesAtTheStartOfBlocks: false      # 不保留块开始处的空行
+MaxEmptyLinesToKeep: 1                       # 保留的最大空行数
+NamespaceIndentation: All                    # 命名空间内全部缩进
+PenaltyBreakBeforeFirstCallParameter: 1      # 首个调用参数前换行的惩罚
+PenaltyBreakComment: 300                     # 注释换行惩罚
+PenaltyBreakFirstLessLess: 120               # <<操作符换行惩罚
+PenaltyBreakString: 1000                     # 字符串换行惩罚
+PenaltyExcessCharacter: 100                  # 超过列宽限制字符惩罚
+PenaltyReturnTypeOnItsOwnLine: 200           # 返回类型独占一行的惩罚
+PointerAlignment: Right                      # 指针对齐到右侧
+ReflowComments: true                         # 重整注释
+SortIncludes:    true                        # 排序包含文件
+SpaceAfterCStyleCast: false                  # C风格强制转换后不加空格
+SpaceBeforeParens: ControlStatements         # 控制语句前加空格
+SpaceBeforeRangeBasedForLoopColon: true      # 基于范围的for循环冒号前加空格
+SpacesInAngles:  false                       # 角括号内不加空格
+SpacesInContainerLiterals: false             # 容器字面量内不加空格
+SpacesInCStyleCastParentheses: false         # C风格强制转换括号内不加空格
+SpacesInParentheses: false                   # 括号内不加空格
+# Standard:        Cpp17                       # 使用C++17标准
+TabWidth:        4                           # 制表符宽度
+UseTab:          Never                       # 不使用制表符，使用空格代替
+
+# 自定义包含路径的排序优先级
+IncludeCategories:
+  - Regex:           '^<.*\.h>'              # 匹配以.h结尾的头文件，优先级为1
+    Priority:        1
+  - Regex:           '^<.*>'                 # 匹配以<开头的头文件，优先级为2
+    Priority:        2
+  - Regex:           '.*'                    # 匹配其他所有文件，优先级为3
+    Priority:        3

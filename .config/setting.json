@@ -1,0 +1,32 @@
+{
+    "Text":{
+        "ROI":["x", "y", "width", "height"]
+    },
+    "Axes":{
+        "灰度计算":[
+            {
+                "source": "灰度计算",
+                "local":211,
+                "attribute":
+                {
+                    "x_label": "time",
+                    "y_label": "value",
+                    "y_lim":[0, 255],
+                    "title": "time with value",
+                    "file": "gary"
+                }
+            },
+            {
+                "source": "灰度计算",
+                "local": 212,
+                "attribute":{
+                    "x_label": "test",
+                    "y_label": "test",
+                    "y_lim": [0, 100],
+                    "title": "test with test",
+                    "file": "fft"
+                }
+            }
+        ]
+    }
+}

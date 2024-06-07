@@ -7,6 +7,7 @@
 #include <QImage>
 #include <QPixmap>
 #include <QThread>
+#include <opencv2/opencv.hpp>
 
 #include "../ImageProcess/ImageProcess.h"
 #include "../MatQueue/SingletonMatQueue.h"
@@ -38,10 +39,8 @@ CaptureShowTask::~CaptureShowTask() {
 
 void CaptureShowTask::algChanged(QString str) {
     for (auto &name : ImageProcess::GetInstance().ImageProcessList) {
-        if (name == str)  // "灰度计算", "光流法", "无目标定位"
-        {
-            int index =
-                ImageProcess::GetInstance().ImageProcessList.indexOf(name);
+        if (name == str) {
+            int index = ImageProcess::GetInstance().ImageProcessList.indexOf(name);
             ImageProcess::GetInstance().setfunction(index);
             SingletonMatQueue::GetInstance()->ClearAllQueue();
             emit changeAxesWithAlg(index);
@@ -53,8 +52,7 @@ void CaptureShowTask::getCaptureStatus(bool boolean) {
     m_videoShowFlag = boolean;
     if (m_timer == nullptr) {
         m_timer = new QTimer;
-        connect(m_timer, &QTimer::timeout, this, &CaptureShowTask::CaptureShow,
-                Qt::DirectConnection);
+        connect(m_timer, &QTimer::timeout, this, &CaptureShowTask::CaptureShow, Qt::DirectConnection);
     }
     if (m_videoShowFlag) {
         m_timer->start(m_fps);
@@ -63,19 +61,15 @@ void CaptureShowTask::getCaptureStatus(bool boolean) {
     }
 }
 void CaptureShowTask::CaptureShow() {
+    // qDebug() << "CaptureShowTask ID:" << QThread::currentThreadId();
     if (SingletonMatQueue::GetInstance()->checkProcessed() == 0) {
         // emit SingletonMatError();
         return;
     }
-    qDebug() << "CaptureShowTask ID:" << QThread::currentThreadId();
     auto q_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
-    cv::Mat mat = q_mat.mat;
     // emit EmitDoubleArg(q_mat.arg);
     emit EmitDoubleArgAndTime(q_mat.arg, q_mat.time);
-    auto qImage = ImageProcess::GetInstance().cvMatToQImage(mat);
-    if (qImage.height() > m_label->maximumHeight() ||
-        qImage.width() > m_label->maximumWidth())
-        qImage = qImage.scaled(m_label->maximumSize());
-    m_label->setFixedSize(qImage.width(), qImage.height());
+    if (m_rect != nullptr) cv::rectangle(q_mat.mat, *m_rect, cv::Scalar(255, 255, 255));
+    auto qImage = ImageProcess::GetInstance().cvMatToQImage(q_mat.mat);
     m_label->setPixmap(QPixmap::fromImage(qImage));
 }

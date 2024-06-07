@@ -6,31 +6,30 @@
 #include <QFunctionPointer>
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QJsonObject>
 #include <QLineSeries>
 #include <QList>
 #include <QObject>
 #include <QPointF>
+#include <QTime>
 #include <QValueAxis>
 #include <opencv2/opencv.hpp>
-#include <QTime>
 
 class AxesFreshTask : public QObject {
     Q_OBJECT
-   public:
-    explicit AxesFreshTask(QChartView *qGraphicsView,
-                           QObject *parent = nullptr);
+  public:
+    AxesFreshTask(QChartView *qChartView, QJsonObject json, QObject *parent = nullptr);
+    AxesFreshTask(QObject *parent = nullptr) : QObject{parent} {}
     ~AxesFreshTask(void);
-
-    void setqChartView(QChartView *qChartView) {
-        this->qChartView = qChartView;
-    }
-
-   public slots:
+    void LazyInit(QChartView *qChartView, QJsonObject json);
+    void setqChartView(QChartView *qChartView) { this->qChartView = qChartView; }
+    void ansysAttribute(AxesFreshTask *, QJsonObject);
+  public slots:
     void axesFreshByDouble(double);
     void changeAxesWithAlgSlot(int);
     void axesFreshByDoubleAndTime(double arg, QTime time);
 
-   private:
+  private:
     QChartView *qChartView;
     QLineSeries *qLineSeries;
     QChart *qChart;

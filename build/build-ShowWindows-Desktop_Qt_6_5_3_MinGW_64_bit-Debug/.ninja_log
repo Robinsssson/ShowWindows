@@ -1,0 +1,18 @@
+# ninja log v5
+252	2485	7394423167800302	CMakeFiles/ShowWindows.dir/settingconfig.cpp.obj	9265c0115342520
+2712	6412	7393952313376821	CMakeFiles/ShowWindows.dir/CaptureShowTask/CaptureShowTask.cpp.obj	302e0d69a7157536
+5053	6132	7394423204212106	ShowWindows.exe	e32b67e18a3de6d6
+3567	10592	7394416102610164	CMakeFiles/ShowWindows.dir/ShowWindows_autogen/mocs_compilation.cpp.obj	32f71ba0a6ab4926
+19	218	7394423145133709	ShowWindows_autogen/timestamp	87d084df7e29607b
+322	3218	7393880030370036	CMakeFiles/ShowWindows.dir/CaptureTask/CaptureTask.cpp.obj	30c188b323a89556
+873	3951	7391891895864425	CMakeFiles/ShowWindows.dir/ImageProcessTask/ImageProcessTask.cpp.obj	e69760b78a253bef
+3572	10242	7394416099128837	CMakeFiles/ShowWindows.dir/main.cpp.obj	abf2cf0ea8ec800c
+19	218	7394423145133709	ShowWindows_autogen/mocs_compilation.cpp	87d084df7e29607b
+19	218	7394423145133709	C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/ShowWindows_autogen/mocs_compilation.cpp	87d084df7e29607b
+874	7477	7394420952466817	CMakeFiles/ShowWindows.dir/Utility/AnsysSetting/ansyssetting.cpp.obj	f6dec0142169a34e
+19	218	7394423145133709	C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/ShowWindows_autogen/timestamp	87d084df7e29607b
+1620	3898	7391871529369923	CMakeFiles/ShowWindows.dir/MatQueue/SingletonMatQueue.cpp.obj	e65b6e67bd90adf6
+250	3273	7394423175654671	CMakeFiles/ShowWindows.dir/AxesFreshTask/axesfreshtask.cpp.obj	beae3105c295dd35
+1625	3214	7391871522509987	CMakeFiles/ShowWindows.dir/FftFreshTask/fftfreshtask.cpp.obj	75367b1bf19f24a7
+247	5053	7394423193452255	CMakeFiles/ShowWindows.dir/mainwindow.cpp.obj	4b4c07bcbbf2e338
+869	3919	7391891895530485	CMakeFiles/ShowWindows.dir/ImageProcess/ImageProcess.cpp.obj	c1c8bf75dfa4cb13

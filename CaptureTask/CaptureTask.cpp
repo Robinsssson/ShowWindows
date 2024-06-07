@@ -33,53 +33,43 @@ CaptureTask::~CaptureTask() {
 
 // Bug in there.
 void CaptureTask::PushMat() {
-    qDebug() << "CaptureTask ID:" << QThread::currentThreadId();
     if (!m_capture->read(*m_mat)) {
         if (m_captureSelect == -1) emit VideoOver();
         getCaptureStatus(false);
     } else {
-        SingletonMatQueue::GetInstance()->enqueueNotProcessed(
-            *m_mat, QTime::currentTime());
-        if (SingletonMatQueue::GetInstance()->checkNotProcessed() > 0) {
+        SingletonMatQueue::GetInstance()->enqueueNotProcessed(*m_mat, QTime::currentTime());
+        if (SingletonMatQueue::GetInstance()->checkNotProcessed() > 0 || SingletonMatQueue::GetInstance()->checkProcessed() <= 5) {
             // QThreadPool::globalInstance()->tryStart(new ImageProcessTask);
-            Q_Mat q_mat =
-                SingletonMatQueue::GetInstance()->dequeueNotProcessed();
-            double num =
-                ImageProcess::GetInstance().process_function(q_mat.mat);
-            SingletonMatQueue::GetInstance()->enqueueProcessedWithArg(
-                q_mat.mat, q_mat.time, num);
+            Q_Mat q_mat = SingletonMatQueue::GetInstance()->dequeueNotProcessed();
+            double num = ImageProcess::GetInstance().process_function(q_mat.mat, m_rect);
+            SingletonMatQueue::GetInstance()->enqueueProcessedWithArg(q_mat.mat, q_mat.time, num);
         }
     }
 }
 
-void CaptureTask::getCaptureNumber(int number) { m_captureSelect = number; }
+void CaptureTask::getCaptureNumber(int number) {
+    m_captureSelect = number;
+}
 
 void CaptureTask::getCaptureStatus(bool boolean) {
     m_switchCapture = boolean;
     if (m_timer == nullptr) {
         m_timer = new QTimer;
-        connect(m_timer, &QTimer::timeout, this, &CaptureTask::PushMat,
-                Qt::DirectConnection);
+        connect(m_timer, &QTimer::timeout, this, &CaptureTask::PushMat, Qt::DirectConnection);
     }
     if (m_switchCapture) {
-        m_timer->start(m_fps);
         if (m_captureSelect == -1) {
             m_capture->open(m_videoName);
-            cv::Mat mat;
-            m_capture->read(mat);
-            qDebug() << mat.type();
+            double fps = m_capture->get(cv::CAP_PROP_FPS);
+            int timerInterval = 1000 / fps;
+            m_timer->start(timerInterval);
+            emit videoFPS(timerInterval);
         } else {
             m_capture->open(m_captureSelect);
-            cv::Mat mat;
-            m_capture->read(mat);
-            qDebug() << mat.type();
+            m_timer->start(m_fps);
         }
         if (!m_capture->isOpened()) {
-            QMessageBox::warning(
-                nullptr, tr("My Application"),
-                tr("The document has been modified.\n"),
-                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel,
-                QMessageBox::Save);
+            QMessageBox::warning(nullptr, tr("My Application"), tr("The document has been modified.\n"), QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
         }
     } else {
         m_timer->stop();

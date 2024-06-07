@@ -1,0 +1,9 @@
+C:/Projects/Qt/OpencvDevelop/ShowWindows/build/CMakeFiles/ShowWindows.dir
+C:/Projects/Qt/OpencvDevelop/ShowWindows/build/CMakeFiles/edit_cache.dir
+C:/Projects/Qt/OpencvDevelop/ShowWindows/build/CMakeFiles/rebuild_cache.dir
+C:/Projects/Qt/OpencvDevelop/ShowWindows/build/CMakeFiles/list_install_components.dir
+C:/Projects/Qt/OpencvDevelop/ShowWindows/build/CMakeFiles/install.dir
+C:/Projects/Qt/OpencvDevelop/ShowWindows/build/CMakeFiles/install/local.dir
+C:/Projects/Qt/OpencvDevelop/ShowWindows/build/CMakeFiles/install/strip.dir
+C:/Projects/Qt/OpencvDevelop/ShowWindows/build/CMakeFiles/ShowWindows_autogen_timestamp_deps.dir
+C:/Projects/Qt/OpencvDevelop/ShowWindows/build/CMakeFiles/ShowWindows_autogen.dir
