@@ -56,19 +56,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_captureShowTask = new CaptureShowTask(ui->VideoShow);
     m_captureShowTask->moveToThread(threadVideoShowTask);
     m_captureTask->moveToThread(threadVideoTask);
-    Ui_Init(m_init_size);
-    MESSAGESHOW(tr("测试"));
-    m_settingDialog = new SettingConfig(this);
-    SingletonMatQueue::GetInstance();
-    auto file = QFile(CONFIG_PATH + "setting.json");
-    m_wait_send_rect = new cv::Rect();
+
     try {
+        auto file = QFile(CONFIG_PATH + "setting.json");
         ansys_setting = new AnsysSetting(file);
         ansys_setting->ansys(ui->tools_widget);
     } catch (...) {
         qDebug() << "error";
         exit(-1);
     }
+    Ui_Init(m_init_size);
+    MESSAGESHOW(tr("测试"));
+    m_settingDialog = new SettingConfig(this);
+    SingletonMatQueue::GetInstance();
+
+    m_wait_send_rect = new cv::Rect();
     // connect
     connect(this, QOverload<int>::of(&MainWindow::thisCapture), m_captureTask, &CaptureTask::getCaptureNumber);
     connect(this, &MainWindow::alg_selected, m_captureShowTask, &CaptureShowTask::algChanged);
@@ -103,6 +105,7 @@ void MainWindow::Ui_Init(QSize size) {
             emit alg_selected(action->text());
             on_pushButtonClose_clicked();
         });
+        if (action->text() != ImageProcess::GetInstance().getName()) connect(action, &QAction::triggered, ansys_setting, &AnsysSetting::reDraw);
     }
 }
 

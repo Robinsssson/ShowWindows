@@ -62,6 +62,7 @@ class MainWindow : public QMainWindow {
 
   public:
     Ui::MainWindow *ui;
+
   private:
     bool m_captureOpenFlag = false;
     bool m_chart_windows_status = false;

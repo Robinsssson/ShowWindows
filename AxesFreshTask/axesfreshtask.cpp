@@ -1,5 +1,6 @@
 #include "axesfreshtask.h"
 
+#include <QChart>
 #include <QJsonArray>
 #include <QThread>
 #include <QTime>
@@ -15,13 +16,13 @@
  ******************************************************************/
 AxesFreshTask::AxesFreshTask(QChartView *qChartView, QJsonObject json, QObject *parent) : QObject{parent} {
     qDebug() << "AxesFreshTask Constructored ID:" << QThread::currentThreadId();
-    qChart = new QChart;
-    qLineSeries = new QLineSeries;
-    xBottomAxis = new QValueAxis;
-    yLeftAxis = new QValueAxis;
+    qChart = new QChart();
+    qLineSeries = new QLineSeries(this);
+    xBottomAxis = new QValueAxis(this);
+    yLeftAxis = new QValueAxis(this);
     qList = new QList<QPointF>;
 
-    auto alg_name = ImageProcess::GetInstance().getName();
+    auto alg_name = json["file"].toString();
     csv_file = new QFile(alg_name + ".csv");
     ansysAttribute(this, json);
 
@@ -101,8 +102,11 @@ void AxesFreshTask::ansysAttribute(AxesFreshTask *obj, QJsonObject json) {
         auto tmp = json[attr];
         this->qChart->setTitle(tmp.toString());
     });
-    map.insert("file", [&](QString attr) {
+    map.insert("on-time", [&](QString attr){
+
     });
+    map.insert("file", [&](QString attr) {});
+    map.insert("interface", [&](QString attr) {});
     for (const auto &attr : json.keys()) map[attr](attr);
 }
 
@@ -141,11 +145,11 @@ void AxesFreshTask::axesFreshByDoubleAndTime(double arg, QTime time) {
 }
 
 AxesFreshTask::~AxesFreshTask(void) {
-    qLineSeries->clear();
-    delete xBottomAxis;
-    delete yLeftAxis;
-    delete qList;
-    delete qChart;
+    // qLineSeries->clear();
+    // delete xBottomAxis;
+    // delete yLeftAxis;
+    // delete qList;
+    // delete qChart;
     csv_file->close();
     delete csv_file;
 }

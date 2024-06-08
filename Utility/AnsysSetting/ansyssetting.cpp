@@ -19,7 +19,7 @@
 #include "../../ImageProcess/ImageProcess.h"
 #include "../../Project_Config.h"
 
-AnsysSetting::AnsysSetting(QFile &file, QObject *parent) : QObject(parent), m_config_file(new QFile(CONFIG_PATH + "config.json")) {
+AnsysSetting::AnsysSetting(QFile &file, QObject *parent) : QObject(parent), m_config_file(new QFile(CONFIG_PATH + "config.json")), global_aw(nullptr), global_tw(nullptr) {
     qDebug() << file.fileName();
     if (!file.exists()) qDebug() << "no file found";
     QJsonParseError json_error;
@@ -36,11 +36,29 @@ AnsysSetting::~AnsysSetting() {
     delete m_config_file;
     delete chart_map;
 }
+void AnsysSetting::reDraw(bool ok) {
+    qDebug() << "enter reDraw function";
 
+    if (global_aw != nullptr) {
+        delete global_aw;  // 删除旧的 global_aw
+        global_aw = nullptr;
+    }
+
+    global_aw = new QWidget(this->m_parent);
+    QVBoxLayout *layout = qobject_cast<QVBoxLayout *>(this->m_parent->layout());
+
+    if (layout) {
+        layout->addWidget(global_aw);
+        createAxesWidgets(global_aw, layout, m_json_object["Axes"].toObject());
+    } else {
+        qWarning() << "Parent layout is null";
+    }
+}
 void AnsysSetting::ansys(QWidget *parent) {
+    this->m_parent = parent;
     QVBoxLayout *parent_vbox = new QVBoxLayout(parent);
-    auto *global_tw = new QWidget(parent);
-    auto *global_aw = new QWidget(parent);
+    global_tw = new QWidget(parent);
+    global_aw = new QWidget(parent);
     parent_vbox->addWidget(global_tw);
     QSpacerItem *vspacer = new QSpacerItem(20, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
     parent_vbox->addSpacerItem(vspacer);
@@ -82,33 +100,60 @@ void AnsysSetting::createTextWidgets(QWidget *parent, QVBoxLayout *layout, const
     }
 }
 
-QWidget* TopLevelParentWidget (QWidget* widget)
-{
-    while (widget -> parentWidget() != Q_NULLPTR) widget = widget -> parentWidget() ;
-    return widget ;
+QWidget *TopLevelParentWidget(QWidget *widget) {
+    while (widget->parentWidget() != Q_NULLPTR) widget = widget->parentWidget();
+    return widget;
 }
 
 void AnsysSetting::createAxesWidgets(QWidget *parent, QVBoxLayout *parent_vbox, const QJsonObject &axesObject) {
-    auto *axes_widget = new QWidget(parent);
+    // Clear existing widgets from the layout
+
+    // auto *axes_widget = new QWidget(parent);
+    auto &axes_widget = parent;
     parent_vbox->addWidget(axes_widget);
     QGridLayout *grid = new QGridLayout(axes_widget);
-    parent_vbox->addLayout(grid);
 
-    int local ,col, row, num;
+    int local, col, row, num;
     auto str = ImageProcess::GetInstance().getName();
+    if (!axesObject.contains(str)) {
+        qWarning() << "axesObject does not contain key:" << str;
+        return;
+    }
+
     auto axes_arr = axesObject[str].toArray();
-    qDebug() <<"axes "<< axes_arr;
+    qDebug() << "axes " << axes_arr;
+
+    if (axes_arr.isEmpty()) {
+        qWarning() << "axes_arr is empty!";
+        return;
+    }
+
     local = axes_arr[0].toObject()["local"].toInt();
-    row = local / 100, col = (local - row * 100) / 10;
-    chart_map->insert(str, QVector<QPair<QChartView *, AxesFreshTask *>>(row * col, QPair<QChartView *, AxesFreshTask *>(new QChartView(axes_widget), new AxesFreshTask())));
-    for (const auto& axes : axes_arr){
-        local = axes.toObject()["local"].toInt();
+    row = local / 100;
+    col = (local - row * 100) / 10;
+
+    // if (!chart_map->contains(str)) {
+    QVector<QPair<QChartView *, AxesFreshTask *>> chartVector(row * col);
+    for (int i = 0; i < row * col; ++i) {
+        auto *chartView = new QChartView(axes_widget);
+        auto *axesTask = new AxesFreshTask(axes_widget);
+        chartVector[i] = QPair<QChartView *, AxesFreshTask *>(chartView, axesTask);
+    }
+    chart_map->insert(str, chartVector);
+    // }
+
+    for (int i = 0; i < row * col; ++i) {
+        local = axes_arr[i].toObject()["local"].toInt();
         num = local % 10;
-        for(const auto &viewPair : chart_map->value(str)) {
-            auto &view = viewPair.first; auto &axes_obj = viewPair.second;
-            grid->addWidget(view, floor((num - 1) / col), num - floor((num - 1) / col) * col - 1);
-            axes_obj->LazyInit(view, axes.toObject()["attribute"].toObject());
-        }
+        auto vec = chart_map->value(str);
+        auto viewPair = vec[i];
+        auto &view = viewPair.first;
+        auto &axes_obj = viewPair.second;
+        int m = floor((num - 1) / col);
+        int n = num - floor((num - 1) / col) * col - 1;
+        qDebug() << "number" << m << n;
+        grid->addWidget(view, m + 1, n + 1);
+        axes_obj->LazyInit(view, axes_arr[i].toObject()["attribute"].toObject());
     }
 }
 

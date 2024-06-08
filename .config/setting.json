@@ -13,7 +13,9 @@
                     "y_label": "value",
                     "y_lim":[0, 255],
                     "title": "time with value",
-                    "file": "gary"
+                    "file": "gary",
+                    "on-time":true,
+                    "interface": "singal"
                 }
             },
             {
@@ -24,7 +26,38 @@
                     "y_label": "test",
                     "y_lim": [0, 100],
                     "title": "test with test",
-                    "file": "fft"
+                    "file": "fft",
+                    "on-time":true,
+                    "interface": "singal"
+                }
+            }
+        ],
+        "光流法":[
+            {
+                "source": "光流法",
+                "local":211,
+                "attribute":
+                {
+                    "x_label": "Guang",
+                    "y_label": "value",
+                    "y_lim":[0, 255],
+                    "title": "Guang",
+                    "file": "gary",
+                    "on-time":true,
+                    "interface": "singal"
+                }
+            },
+            {
+                "source": "光流法",
+                "local": 212,
+                "attribute":{
+                    "x_label": "test",
+                    "y_label": "test",
+                    "y_lim": [0, 100],
+                    "title": "Guang",
+                    "file": "fft",
+                    "on-time": false,
+                    "interface": "file"
                 }
             }
         ]
