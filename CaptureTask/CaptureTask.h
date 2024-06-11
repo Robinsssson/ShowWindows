@@ -14,12 +14,12 @@
 class CaptureTask : public QObject {
     Q_OBJECT
 
-  public:
+public:
     CaptureTask();
 
     ~CaptureTask() override;
 
-  public slots:
+public slots:
 
     void SetVideo(const QString &string);
 
@@ -33,7 +33,7 @@ class CaptureTask : public QObject {
 
     void taskGetRect(cv::Rect *rect) { m_rect = rect; }
 
-  signals:
+signals:
 
     void VideoOver();
 
@@ -41,7 +41,7 @@ class CaptureTask : public QObject {
 
     void SendMat(cv::Mat);
 
-  private:
+private:
     int m_fps = 1;
     int m_captureSelect = 0;
     bool m_switchCapture = false;

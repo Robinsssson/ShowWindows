@@ -11,14 +11,14 @@ namespace Ui {
 class SettingConfig : public QDialog {
     Q_OBJECT
 
-  public:
+public:
     explicit SettingConfig(QWidget *parent = nullptr);
     ~SettingConfig();
-  public slots:
+public slots:
     void on_pushButtonFirm_clicked();
     void on_pushButtonCancel_clicked();
 
-  private:
+private:
     Ui::SettingConfig *ui;
 };
 

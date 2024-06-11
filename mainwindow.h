@@ -21,21 +21,27 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-  public:
+public:
     explicit MainWindow(QWidget *parent = nullptr);
 
     ~MainWindow() override;
 
     void set_video_show(QSize size, bool is_signal = false);
 
-  private:
+    QObject *get_member(QString);
+
+    auto* get_captureShowTask() { return m_captureShowTask; }
+
+private:
     static std::vector<int> RefreshCameraNum(QSize *size);
 
     void RefreshCaptureSelect();
 
     void Ui_Init(QSize size);
 
-  public slots:
+    void initializeMemberMap();
+
+public slots:
 
     void on_pushButtonOpen_clicked();
 
@@ -46,7 +52,9 @@ class MainWindow : public QMainWindow {
     void on_actionFPS_triggered();
 
     void on_actionSetting_triggered();
-  signals:
+signals:
+
+    void mainWindowCreated(MainWindow *);
 
     void thisCapture(int number);
 
@@ -60,10 +68,10 @@ class MainWindow : public QMainWindow {
 
     void send_rect(cv::Rect *);
 
-  public:
+public:
     Ui::MainWindow *ui;
 
-  private:
+private:
     bool m_captureOpenFlag = false;
     bool m_chart_windows_status = false;
     QString m_videoFileName;
@@ -79,5 +87,10 @@ class MainWindow : public QMainWindow {
     SettingConfig *m_settingDialog;
     QSize m_init_size;
     cv::Rect *m_wait_send_rect = nullptr;
+    QMap<QString, QObject *> memberMap;
+    QList<QThread *> axesThreadList;
+    int axesThreadListLength = 6;
+    int axesThreadListCount = 0;
+    QVector<QPair<QChartView *, AxesFreshTask *>> axesTaskList;
 };
 #endif  // MAINWINDOW_H

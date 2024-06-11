@@ -13,23 +13,23 @@
 
 class CaptureShowTask : public QObject {
     Q_OBJECT
-  public:
+public:
     CaptureShowTask(QLabel *label);
     ~CaptureShowTask() override;
     void CaptureShow();
-  public slots:
+public slots:
     void getCaptureStatus(bool);
     void GetFpsNumber(int fps) { m_fps = fps; }
     void algChanged(QString);
     void showTaskGetRect(cv::Rect *rect) { m_rect = rect; }
     void getVideoFPS(int fps) { m_fps = fps; }
-  signals:
+signals:
     void EmitDoubleArg(double);
     void EmitDoubleArgAndTime(double, QTime);
     void SingletonMatError();
     void changeAxesWithAlg(int);
 
-  private:
+private:
     bool m_videoShowFlag{};
     int m_fps{};
     QTimer *m_timer;

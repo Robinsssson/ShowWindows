@@ -18,6 +18,15 @@
 
 #include "../../ImageProcess/ImageProcess.h"
 #include "../../Project_Config.h"
+// extern MainWindow *mainWin;
+/**
+ * ImageProcess Function序列化，序列化的实现
+ * 1. on-time 标签
+ *  其决定是否在运行时进行坐标轴绘制操作，其通常是与一个emit绑定。
+ * 2. 绑定的序列化
+ *
+ *  connect(m_emit, &emit::function, m_axes, fresh())
+ */
 
 AnsysSetting::AnsysSetting(QFile &file, QObject *parent) : QObject(parent), m_config_file(new QFile(CONFIG_PATH + "config.json")), global_aw(nullptr), global_tw(nullptr) {
     qDebug() << file.fileName();
@@ -70,6 +79,8 @@ void AnsysSetting::ansys(QWidget *parent) {
             createTextWidgets(global_tw, gtw_vbox, m_json_object[obj].toObject());
         else if (obj == "Axes")
             createAxesWidgets(global_aw, parent_vbox, m_json_object[obj].toObject());
+        else {
+        }
     }
 
     addButton(global_tw, gtw_vbox, global_aw);
@@ -115,23 +126,14 @@ void AnsysSetting::createAxesWidgets(QWidget *parent, QVBoxLayout *parent_vbox, 
 
     int local, col, row, num;
     auto str = ImageProcess::GetInstance().getName();
-    if (!axesObject.contains(str)) {
-        qWarning() << "axesObject does not contain key:" << str;
-        return;
-    }
 
     auto axes_arr = axesObject[str].toArray();
     qDebug() << "axes " << axes_arr;
 
-    if (axes_arr.isEmpty()) {
-        qWarning() << "axes_arr is empty!";
-        return;
-    }
-
     local = axes_arr[0].toObject()["local"].toInt();
     row = local / 100;
     col = (local - row * 100) / 10;
-
+    if (row <= 0 || col <= 0) throw "error created because of row or col <= 0";
     // if (!chart_map->contains(str)) {
     QVector<QPair<QChartView *, AxesFreshTask *>> chartVector(row * col);
     for (int i = 0; i < row * col; ++i) {

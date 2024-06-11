@@ -60,12 +60,9 @@ void CaptureShowTask::getCaptureStatus(bool boolean) {
         m_timer->stop();
     }
 }
+
 void CaptureShowTask::CaptureShow() {
-    // qDebug() << "CaptureShowTask ID:" << QThread::currentThreadId();
-    if (SingletonMatQueue::GetInstance()->checkProcessed() == 0) {
-        // emit SingletonMatError();
-        return;
-    }
+    if (SingletonMatQueue::GetInstance()->checkProcessed() == 0) return;
     auto q_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
     // emit EmitDoubleArg(q_mat.arg);
     emit EmitDoubleArgAndTime(q_mat.arg, q_mat.time);

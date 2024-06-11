@@ -27,7 +27,7 @@
                     "y_lim": [0, 100],
                     "title": "test with test",
                     "file": "fft",
-                    "on-time":true,
+                    "on-time":false,
                     "interface": "singal"
                 }
             }
@@ -40,7 +40,7 @@
                 {
                     "x_label": "Guang",
                     "y_label": "value",
-                    "y_lim":[0, 255],
+                    "y_lim":[0, 1000],
                     "title": "Guang",
                     "file": "gary",
                     "on-time":true,

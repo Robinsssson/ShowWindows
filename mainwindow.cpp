@@ -56,13 +56,19 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     m_captureShowTask = new CaptureShowTask(ui->VideoShow);
     m_captureShowTask->moveToThread(threadVideoShowTask);
     m_captureTask->moveToThread(threadVideoTask);
-
+    initializeMemberMap();
     try {
         auto file = QFile(CONFIG_PATH + "setting.json");
         ansys_setting = new AnsysSetting(file);
         ansys_setting->ansys(ui->tools_widget);
+    } catch (char *e) {
+        qDebug() << "Char Exception: " << e;
+        exit(-1);
+    } catch (const std::exception &e) {
+        qDebug() << "Standard Exception: " << e.what();
+        exit(-1);
     } catch (...) {
-        qDebug() << "error";
+        qDebug() << "Unknown Exception";
         exit(-1);
     }
     Ui_Init(m_init_size);
@@ -93,6 +99,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     // connect(ansys_setting->m_button, &QPushButton::clicked, this, [this]() { set_video_show(this->m_init_size, true); });
     threadVideoTask->start(QThread::HighestPriority);
     threadVideoShowTask->start(QThread::HighPriority);
+    for (int i = 0; i < axesThreadListLength; i ++) {
+        axesThreadList.append(new QThread(this));
+    }
 }
 
 void MainWindow::Ui_Init(QSize size) {
@@ -107,6 +116,22 @@ void MainWindow::Ui_Init(QSize size) {
         });
         if (action->text() != ImageProcess::GetInstance().getName()) connect(action, &QAction::triggered, ansys_setting, &AnsysSetting::reDraw);
     }
+}
+
+void MainWindow::initializeMemberMap() {
+    memberMap["ansys_setting"] = ansys_setting;
+    memberMap["threadVideoShowTask"] = threadVideoShowTask;
+    memberMap["threadVideoTask"] = threadVideoTask;
+    memberMap["m_captureShowTask"] = m_captureShowTask;
+    memberMap["m_captureTask"] = m_captureTask;
+    memberMap["m_settingDialog"] = m_settingDialog;
+}
+
+QObject *MainWindow::get_member(QString memberName) {
+    if (memberMap.contains(memberName)) {
+        return memberMap[memberName];
+    }
+    throw std::runtime_error("noMember");
 }
 
 void MainWindow::set_video_show(QSize size, bool is_signal) {
@@ -128,6 +153,7 @@ void MainWindow::set_video_show(QSize size, bool is_signal) {
 }
 
 MainWindow::~MainWindow() {
+    on_pushButtonClose_clicked();
     threadVideoShowTask->quit();
     threadVideoShowTask->wait();
     threadVideoShowTask->deleteLater();
@@ -146,6 +172,13 @@ MainWindow::~MainWindow() {
 
 void MainWindow::on_pushButtonOpen_clicked() {
     if (m_captureOpenFlag) return;
+    axesTaskList = ansys_setting->chart_map->value(ImageProcess::GetInstance().getName());
+    foreach (auto &axes, axesTaskList) {
+        if (!axes.second->getOnTime())
+            continue;
+        axes.second->moveToThread(axesThreadList[axesThreadListCount]);
+        axesThreadList[axesThreadListCount++]->start();
+    }
     m_captureOpenFlag = true;
     SingletonMatQueue::GetInstance()->ClearAllQueue();
     emit switchCapture(m_captureOpenFlag);
@@ -154,6 +187,9 @@ void MainWindow::on_pushButtonOpen_clicked() {
 
 void MainWindow::on_pushButtonClose_clicked() {
     if (!m_captureOpenFlag) return;
+    for(auto& thread : axesThreadList) {
+        if (thread->isRunning()) thread->quit();
+    }
     m_captureOpenFlag = false;
     emit switchCapture(m_captureOpenFlag);
     m_videoFileFlag = false;

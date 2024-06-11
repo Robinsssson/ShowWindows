@@ -13,7 +13,7 @@
 #include <opencv2/opencv.hpp>
 using PublicImageProcessFunction = double (*)(cv::Mat &);
 class ImageProcess {
-  public:
+public:
     // QImage cvMat2QImage(const cv::Mat &mat);
     int LKOptricalFlow_times = 3;
     bool LKOptricalFlow_first_entry = true;
@@ -79,7 +79,7 @@ class ImageProcess {
         return 0.0;
     }
 
-  private:
+private:
     ImageProcess() {
         kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3));
         fgbg = cv::createBackgroundSubtractorMOG2();

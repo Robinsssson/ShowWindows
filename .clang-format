@@ -1,7 +1,7 @@
 ---
 Language:        Cpp          # 指定语言为C++
 BasedOnStyle:    Google       # 基于Google的代码风格
-AccessModifierOffset: -2      # 访问修饰符的缩进偏移量设为-2
+AccessModifierOffset: -4      # 访问修饰符的缩进偏移量设为-2
 AlignAfterOpenBracket: DontAlign  # 不对齐在括号后面开始的内容
 AlignOperands:   false        # 不对齐操作数
 AlignTrailingComments: true   # 对齐尾随注释
@@ -40,15 +40,6 @@ SpacesInAngles:  false                       # 角括号内不加空格
 SpacesInContainerLiterals: false             # 容器字面量内不加空格
 SpacesInCStyleCastParentheses: false         # C风格强制转换括号内不加空格
 SpacesInParentheses: false                   # 括号内不加空格
-# Standard:        Cpp17                       # 使用C++17标准
+# Standard:        Cpp17                     # 使用C++17标准
 TabWidth:        4                           # 制表符宽度
 UseTab:          Never                       # 不使用制表符，使用空格代替
-
-# 自定义包含路径的排序优先级
-IncludeCategories:
-  - Regex:           '^<.*\.h>'              # 匹配以.h结尾的头文件，优先级为1
-    Priority:        1
-  - Regex:           '^<.*>'                 # 匹配以<开头的头文件，优先级为2
-    Priority:        2
-  - Regex:           '.*'                    # 匹配其他所有文件，优先级为3
-    Priority:        3

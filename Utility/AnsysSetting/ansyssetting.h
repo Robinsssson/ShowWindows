@@ -12,7 +12,7 @@
 #include "../../AxesFreshTask/axesfreshtask.h"
 class AnsysSetting : public QObject {
     Q_OBJECT
-  public:
+public:
     explicit AnsysSetting(QFile &file, QObject *parent = nullptr);
     ~AnsysSetting();
     void ansys(QWidget *parent);
@@ -20,10 +20,11 @@ class AnsysSetting : public QObject {
     QPushButton *m_button;
     QMap<QString, QVector<QPair<QChartView *, AxesFreshTask *>>> *chart_map;
     QWidget *global_aw, *global_tw, *m_parent;
-  public slots:
+
+public slots:
     void reDraw(bool);
 
-  private:
+private:
     void createTextWidgets(QWidget *parent, QVBoxLayout *layout, const QJsonObject &textObject);
     void createAxesWidgets(QWidget *parent, QVBoxLayout *parent_vbox, const QJsonObject &axesObject);
     void addButton(QWidget *parent, QVBoxLayout *layout, QWidget *connectParent);

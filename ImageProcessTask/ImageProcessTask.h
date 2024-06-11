@@ -9,7 +9,7 @@
 #include <QRunnable>
 
 class ImageProcessTask : public QRunnable {
-  public:
+public:
     ImageProcessTask() : QRunnable() { setAutoDelete(true); }
 
     void run() override;

@@ -63,6 +63,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         settingconfig.h settingconfig.cpp settingconfig.ui
         Utility/AnsysSetting/ansyssetting.h Utility/AnsysSetting/ansyssetting.cpp
         .config/setting.json
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET ShowWindows APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

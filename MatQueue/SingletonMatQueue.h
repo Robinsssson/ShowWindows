@@ -1,7 +1,3 @@
-//
-// Created by Robinson on 2023/11/22.
-//
-
 #ifndef OPENCVPROJECT_SINGLETONMATQUEUE_H
 #define OPENCVPROJECT_SINGLETONMATQUEUE_H
 
@@ -13,9 +9,10 @@
 #include <QSharedPointer>
 #include <QTime>
 #include <opencv2/opencv.hpp>
+#include <queue>
 
 struct Q_Mat {
-    Q_Mat(QTime time, const cv::Mat &mat) {
+    Q_Mat(QTime time, const cv::Mat mat) {
         this->mat = mat;
         this->time = time;
     }
@@ -26,10 +23,16 @@ struct Q_Mat {
     double arg = 0;
 };
 
+struct Q_MatCompare {
+    bool operator()(const Q_Mat &lhs, const Q_Mat &rhs) const {
+        return lhs.time > rhs.time;  // 按时间排序，时间小的优先
+    }
+};
+
 class SingletonMatQueue : public QObject {
     Q_OBJECT
 
-  public:
+public:
     SingletonMatQueue() {}
 
     ~SingletonMatQueue() override = default;
@@ -38,7 +41,7 @@ class SingletonMatQueue : public QObject {
 
     SingletonMatQueue &operator=(const SingletonMatQueue &) = delete;
 
-  public:
+public:
     static SingletonMatQueue *GetInstance() {
         if (m_instance == NULL) {
             QMutexLocker mutexLocker(&m_mutex);
@@ -54,26 +57,28 @@ class SingletonMatQueue : public QObject {
 
     void enqueueProcessed(const cv::Mat &mat, const QTime &time) {
         QMutexLocker mutexLocker(&m_mutex);
-        m_matQueueProcessed.enqueue(Q_Mat(time, mat));
+        m_matQueueProcessed.push(Q_Mat(time, mat));
     }
 
     void enqueueProcessedWithArg(const cv::Mat &mat, const QTime &time, double arg) {
         QMutexLocker mutexLocker(&m_mutex);
         auto q_mat = Q_Mat(time, mat);
         q_mat.set_arg(arg);
-        m_matQueueProcessed.enqueue(q_mat);
+        m_matQueueProcessed.push(q_mat);
     }
 
     Q_Mat dequeueNotProcessed() {
         QMutexLocker mutexLocker(&m_mutex);
-        if (m_matQueueNotProcessed.isEmpty()) return m_matQueueNotProcessed.head();
+        if (m_matQueueNotProcessed.isEmpty()) return Q_Mat(QTime(), cv::Mat());
         return m_matQueueNotProcessed.dequeue();
     }
 
     Q_Mat dequeueProcessed() {
         QMutexLocker mutexLocker(&m_mutex);
-        if (m_matQueueProcessed.isEmpty()) return m_matQueueProcessed.head();
-        return m_matQueueProcessed.dequeue();
+        if (m_matQueueProcessed.empty()) return Q_Mat(QTime(), cv::Mat());
+        Q_Mat top = m_matQueueProcessed.top();
+        m_matQueueProcessed.pop();
+        return top;
     }
 
     long long checkNotProcessed() {
@@ -89,14 +94,16 @@ class SingletonMatQueue : public QObject {
     void ClearAllQueue() {
         QMutexLocker mutexLocker(&m_mutex);
         m_matQueueNotProcessed.clear();
-        m_matQueueProcessed.clear();
+        while (!m_matQueueProcessed.empty()) {
+            m_matQueueProcessed.pop();
+        }
     }
 
-  private:
+private:
     static QMutex m_mutex;
     static SingletonMatQueue *m_instance;
     QQueue<Q_Mat> m_matQueueNotProcessed;
-    QQueue<Q_Mat> m_matQueueProcessed;  // 改成优先队列
+    std::priority_queue<Q_Mat, std::vector<Q_Mat>, Q_MatCompare> m_matQueueProcessed;
 };
 
 #endif  // OPENCVPROJECT_SINGLETONMATQUEUE_H
