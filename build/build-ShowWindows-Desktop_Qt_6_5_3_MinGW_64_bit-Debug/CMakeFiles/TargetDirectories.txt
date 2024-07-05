@@ -1,9 +1,0 @@
-C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/ShowWindows.dir
-C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
-C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
-C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
-C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/install.dir
-C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
-C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
-C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/ShowWindows_autogen_timestamp_deps.dir
-C:/Projects/Qt/OpencvDevelop/ShowWindows/build/build-ShowWindows-Desktop_Qt_6_5_3_MinGW_64_bit-Debug/CMakeFiles/ShowWindows_autogen.dir
