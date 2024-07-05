@@ -18,6 +18,8 @@ ShowWindows_autogen/timestamp: \
   C:/Projects/Qt/OpencvDevelop/ShowWindows/Utility/AnsysSetting/ansyssetting.cpp \
   C:/Projects/Qt/OpencvDevelop/ShowWindows/Utility/AnsysSetting/ansyssetting.h \
   C:/Projects/Qt/OpencvDevelop/ShowWindows/Utility/csv/csv.h \
+  C:/Projects/Qt/OpencvDevelop/ShowWindows/Utility/fft/fft_from_csv.cpp \
+  C:/Projects/Qt/OpencvDevelop/ShowWindows/Utility/fft/fft_from_csv.h \
   C:/Projects/Qt/OpencvDevelop/ShowWindows/Utility/fftw-3.3.5-dll64/include/fftw3.h \
   .qtc/package-manager/auto-setup.cmake \
   CMakeFiles/3.27.7/CMakeCXXCompiler.cmake \

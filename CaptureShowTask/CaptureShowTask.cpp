@@ -65,8 +65,8 @@ void CaptureShowTask::CaptureShow() {
     if (SingletonMatQueue::GetInstance()->checkProcessed() == 0) return;
     auto q_mat = SingletonMatQueue::GetInstance()->dequeueProcessed();
     // emit EmitDoubleArg(q_mat.arg);
-    emit EmitDoubleArgAndTime(q_mat.arg, q_mat.time);
     if (m_rect != nullptr) cv::rectangle(q_mat.mat, *m_rect, cv::Scalar(255, 255, 255));
     auto qImage = ImageProcess::GetInstance().cvMatToQImage(q_mat.mat);
     m_label->setPixmap(QPixmap::fromImage(qImage));
+    emit EmitDoubleArgAndTime(q_mat.arg, q_mat.time);
 }

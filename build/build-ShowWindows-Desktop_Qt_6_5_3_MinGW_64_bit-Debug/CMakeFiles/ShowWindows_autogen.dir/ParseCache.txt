@@ -5137,6 +5137,7 @@ C:/Projects/Qt/OpencvDevelop/ShowWindows/AxesFreshTask/axesfreshtask.cpp
 C:/Projects/Qt/OpencvDevelop/ShowWindows/CaptureShowTask/CaptureShowTask.cpp
 C:/Projects/Qt/OpencvDevelop/ShowWindows/CaptureTask/CaptureTask.cpp
 C:/Projects/Qt/OpencvDevelop/ShowWindows/FftFreshTask/fftfreshtask.cpp
+C:/Projects/Qt/OpencvDevelop/ShowWindows/Utility/fft/fft_from_csv.h
 C:/Projects/Qt/OpencvDevelop/ShowWindows/main.cpp
 C:/Projects/Qt/OpencvDevelop/ShowWindows/ImageProcess/ImageProcess.cpp
 C:/Projects/Qt/OpencvDevelop/ShowWindows/ImageProcessTask/ImageProcessTask.cpp
@@ -5146,3 +5147,4 @@ C:/Projects/Qt/OpencvDevelop/ShowWindows/mainwindow.cpp
 C:/Projects/Qt/OpencvDevelop/ShowWindows/settingconfig.cpp
  uic:ui_settingconfig.h
 C:/Projects/Qt/OpencvDevelop/ShowWindows/Utility/fftw-3.3.5-dll64/include/fftw3.h
+C:/Projects/Qt/OpencvDevelop/ShowWindows/Utility/fft/fft_from_csv.cpp

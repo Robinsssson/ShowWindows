@@ -30,7 +30,7 @@ public:
 
     QObject *get_member(QString);
 
-    auto* get_captureShowTask() { return m_captureShowTask; }
+    auto *get_captureShowTask() { return m_captureShowTask; }
 
 private:
     static std::vector<int> RefreshCameraNum(QSize *size);
@@ -67,6 +67,10 @@ signals:
     void alg_selected(QString);
 
     void send_rect(cv::Rect *);
+
+    void ShowFFT();
+
+    void is_open(bool);
 
 public:
     Ui::MainWindow *ui;

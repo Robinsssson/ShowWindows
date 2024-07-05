@@ -9,10 +9,10 @@
                 "local":211,
                 "attribute":
                 {
-                    "x_label": "time",
-                    "y_label": "value",
+                    "x_label": "Time",
+                    "y_label": "Gray",
                     "y_lim":[0, 255],
-                    "title": "time with value",
+                    "title": "Gray Function",
                     "file": "gary",
                     "on-time":true,
                     "interface": "singal"
@@ -22,10 +22,10 @@
                 "source": "灰度计算",
                 "local": 212,
                 "attribute":{
-                    "x_label": "test",
-                    "y_label": "test",
-                    "y_lim": [0, 100],
-                    "title": "test with test",
+                    "x_label": "TEST",
+                    "y_label": "TEST",
+                    "y_lim": [0, 300],
+                    "title": "TEST",
                     "file": "fft",
                     "on-time":false,
                     "interface": "singal"
@@ -38,11 +38,11 @@
                 "local":211,
                 "attribute":
                 {
-                    "x_label": "Guang",
-                    "y_label": "value",
-                    "y_lim":[0, 1000],
-                    "title": "Guang",
-                    "file": "gary",
+                    "x_label": "Time",
+                    "y_label": "Amplitude",
+                    "y_lim":[0, 500],
+                    "title": "Optical flow method time-domain curve",
+                    "file": "GuangLiufa",
                     "on-time":true,
                     "interface": "singal"
                 }
@@ -51,10 +51,68 @@
                 "source": "光流法",
                 "local": 212,
                 "attribute":{
-                    "x_label": "test",
-                    "y_label": "test",
-                    "y_lim": [0, 100],
-                    "title": "Guang",
+                    "x_label": "frequency",
+                    "y_label": "Amplitude",
+                    "y_lim": [0, 1750],
+                    "title": "Optical flow method frequency domain curve",
+                    "file": "fft",
+                    "on-time": false,
+                    "interface": "file"
+                }
+            }
+        ],
+        "无目标定位":[
+            {
+                "source": "无目标定位",
+                "local":211,
+                "attribute":
+                {
+                    "x_label": "Time",
+                    "y_label": "Amplitude",
+                    "y_lim":[0, 500],
+                    "title": "no targeting method time-domain curve",
+                    "file": "GuangLiufa",
+                    "on-time":true,
+                    "interface": "singal"
+                }
+            },
+            {
+                "source": "无目标定位",
+                "local": 212,
+                "attribute":{
+                    "x_label": "frequency",
+                    "y_label": "Amplitude",
+                    "y_lim": [0, 1750],
+                    "title": "no targeting method frequency domain curve",
+                    "file": "fft",
+                    "on-time": false,
+                    "interface": "file"
+                }
+            }
+        ],
+        "像素级别有目标":[
+            {
+                "source": "像素级别有目标",
+                "local":211,
+                "attribute":
+                {
+                    "x_label": "Time",
+                    "y_label": "Amplitude",
+                    "y_lim":[0, 500],
+                    "title": "Pixel level with targets method time-domain curve",
+                    "file": "GuangLiufa",
+                    "on-time":true,
+                    "interface": "singal"
+                }
+            },
+            {
+                "source": "像素级别有目标",
+                "local": 212,
+                "attribute":{
+                    "x_label": "frequency",
+                    "y_label": "Amplitude",
+                    "y_lim": [0, 1750],
+                    "title": "Pixel level with targets method frequency domain curve",
                     "file": "fft",
                     "on-time": false,
                     "interface": "file"

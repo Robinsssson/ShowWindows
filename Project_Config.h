@@ -5,6 +5,7 @@
 #ifndef OPENCV_PROJECT_PROJECT_CONFIG_H
 #define OPENCV_PROJECT_PROJECT_CONFIG_H
 #include <QString>
+
 const int MAX_CAPTURE_NUM = 10;
 #define CAPTURE_ACTION_CREATE(n) capture_action##n
 #define DEBUG_MODE

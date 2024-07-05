@@ -28,20 +28,22 @@ public:
     void ansysAttribute(AxesFreshTask *, QJsonObject);
     bool getOnTime() const { return onTime; }
 public slots:
-    void axesFreshByDouble(double);
+    void axesFreshByFile();
     void changeAxesWithAlgSlot(int);
     void axesFreshByDoubleAndTime(double arg, QTime time);
+    void is_open_video(bool);
 
 private:
-    QChartView *qChartView;
-    QLineSeries *qLineSeries;
-    QChart *qChart;
-    QValueAxis *xBottomAxis;
-    QValueAxis *yLeftAxis;
-    QList<QPointF> *qList;
-    QFile *csv_file;
+    QChartView *qChartView = nullptr;
+    QLineSeries *qLineSeries = nullptr;
+    QChart *qChart = nullptr;
+    QAbstractAxis *xBottomAxis = nullptr;
+    QValueAxis *yLeftAxis = nullptr;
+    QList<QPointF> *qList = nullptr;
+    QFile *csv_file = nullptr;
     int times = 0;
     bool onTime;
+    bool first_entry = true;
     MainWindow *mainWin = nullptr;
 };
 

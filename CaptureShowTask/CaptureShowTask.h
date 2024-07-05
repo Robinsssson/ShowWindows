@@ -34,7 +34,7 @@ private:
     int m_fps{};
     QTimer *m_timer;
     QLabel *m_label;
-    cv::Rect *m_rect;
+    cv::Rect *m_rect = nullptr;
 };
 
 #endif  // OPENCVPROJECT_CAPTURESHOWTASK_H

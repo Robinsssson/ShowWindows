@@ -17,10 +17,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     include_directories(${FFTW3_INCLUDE_DIR})
 
 elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-
     set(OpenCV_DIR "/usr/local/lib/cmake/opencv4")
     set(Qt_DIR "/opt/Qt/6.5.3/gcc_64/lib/cmake/Qt6")
-
 endif()
 
 set(CMAKE_CXX_STANDARD 17)
@@ -49,6 +47,8 @@ set(PROJECT_SOURCES
         AxesFreshTask/axesfreshtask.cpp
         Utility/csv/csv.h
         Utility/fftw-3.3.5-dll64/include/fftw3.h
+        Utility/fft/fft_from_csv.cpp
+        Utility/fft/fft_from_csv.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -61,9 +61,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         BugLog.md
         FftFreshTask/fftfreshtask.h FftFreshTask/fftfreshtask.cpp
         settingconfig.h settingconfig.cpp settingconfig.ui
-        Utility/AnsysSetting/ansyssetting.h Utility/AnsysSetting/ansyssetting.cpp
-        .config/setting.json
-
+        Utility/AnsysSetting/ansyssetting.h
+        Utility/AnsysSetting/ansyssetting.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET ShowWindows APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

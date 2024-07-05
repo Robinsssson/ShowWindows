@@ -75,7 +75,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     MESSAGESHOW(tr("测试"));
     m_settingDialog = new SettingConfig(this);
     SingletonMatQueue::GetInstance();
-
     m_wait_send_rect = new cv::Rect();
     // connect
     connect(this, QOverload<int>::of(&MainWindow::thisCapture), m_captureTask, &CaptureTask::getCaptureNumber);
@@ -96,10 +95,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         QMessageBox::warning(this, tr("singleton mat crushed"), tr("restart the application"));
         SingletonMatQueue::GetInstance()->ClearAllQueue();
     });
-    // connect(ansys_setting->m_button, &QPushButton::clicked, this, [this]() { set_video_show(this->m_init_size, true); });
+    connect(ansys_setting->m_button, &QPushButton::clicked, this, [this]() { set_video_show(this->m_init_size, true); });
     threadVideoTask->start(QThread::HighestPriority);
     threadVideoShowTask->start(QThread::HighPriority);
-    for (int i = 0; i < axesThreadListLength; i ++) {
+    for (int i = 0; i < axesThreadListLength; i++) {
         axesThreadList.append(new QThread(this));
     }
 }
@@ -114,7 +113,8 @@ void MainWindow::Ui_Init(QSize size) {
             emit alg_selected(action->text());
             on_pushButtonClose_clicked();
         });
-        if (action->text() != ImageProcess::GetInstance().getName()) connect(action, &QAction::triggered, ansys_setting, &AnsysSetting::reDraw);
+        if (action->text() != ImageProcess::GetInstance().getName())
+            connect(action, &QAction::triggered, ansys_setting, &AnsysSetting::reDraw);
     }
 }
 
@@ -174,20 +174,20 @@ void MainWindow::on_pushButtonOpen_clicked() {
     if (m_captureOpenFlag) return;
     axesTaskList = ansys_setting->chart_map->value(ImageProcess::GetInstance().getName());
     foreach (auto &axes, axesTaskList) {
-        if (!axes.second->getOnTime())
-            continue;
+        if (!axes.second->getOnTime()) continue;
         axes.second->moveToThread(axesThreadList[axesThreadListCount]);
         axesThreadList[axesThreadListCount++]->start();
     }
     m_captureOpenFlag = true;
     SingletonMatQueue::GetInstance()->ClearAllQueue();
     emit switchCapture(m_captureOpenFlag);
+    emit is_open(true);
     MESSAGESHOW(tr("摄像头开启"));
 }
 
 void MainWindow::on_pushButtonClose_clicked() {
     if (!m_captureOpenFlag) return;
-    for(auto& thread : axesThreadList) {
+    for (auto &thread : axesThreadList) {
         if (thread->isRunning()) thread->quit();
     }
     m_captureOpenFlag = false;
@@ -195,6 +195,8 @@ void MainWindow::on_pushButtonClose_clicked() {
     m_videoFileFlag = false;
     set_video_show(m_init_size);
     MESSAGESHOW(tr("摄像头关闭"));
+    emit ShowFFT();
+    emit is_open(false);
 }
 
 void MainWindow::on_actionFPS_triggered() {
