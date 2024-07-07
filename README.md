@@ -2,19 +2,38 @@
 
 ## Tool Chains
 
-- platform: windows
+- Platform: Windows11/10
 
-- toolchains: `Qt6.5.3`, `opencv 4.8.1`, `gcc-qt`
+- Toolchains: `Qt6.5.3`, `opencv 4.8.1`, `gcc-qt`
 
 - 3rdparty:[`fftw3-3`](https://www.fftw.org/download.html), [`csv`](https://github.com/ben-strasser/fast-cpp-csv-parser)
 
-- Lisence: GPL
+- License: GPL
 
-- how to build it? add all relay file and toolchains in your computer. use `cmake --build`to compiler the project.
+- How to build it? add all relay file and toolchains in your computer. use `cmake --build`to compiler the project.
 
 ## development docs [中文]
 
 本项目通过`mainwindows.cpp`来组织所有文件。在构造函数中创建任务线程。
+
+### 文件树
+
+```shell
+ShowWindows
+    ├─AxesFreshTask  		# Axes坐标更新
+    ├─CaptureShowTask		# 摄像数据展示
+    ├─CaptureTask			# 摄像数据采集
+    ├─Docs					# 文档
+    ├─FftFreshTask			# [弃用]
+    ├─ImageProcess			# 图像处理算法
+    ├─ImageProcessTask		# 图像处理线程
+    ├─MatQueue				# 图像FIFO
+    └─Utility				# 其他组件
+        ├─AnsysSetting      # Axes Text 的Json解析
+        ├─csv				# csv库
+        ├─fft				# fft使用
+        └─fftw-3.3.5-dll64	# fftw调度
+```
 
 ### 线程调度
 
